@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_editor"
+    app:startDestination="@id/picEditorFragment">
+
+    <fragment
+        android:id="@+id/picEditorFragment"
+        android:name="com.appexecutors.piceditor.PicEditorFragment"
+        android:label="fragment_pic_editor"
+        tools:layout="@layout/fragment_pic_editor" >
+        <action
+            android:id="@+id/action_picEditorFragment_to_cropRotateFragment"
+            app:destination="@id/cropRotateFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/cropRotateFragment"
+        android:name="com.appexecutors.piceditor.editorengine.actions.CropRotateFragment"
+        android:label="CropRotateFragment" >
+        <action
+            android:id="@+id/action_cropRotateFragment_to_picEditorFragment"
+            app:destination="@id/picEditorFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@+id/navigation_editor"
+            app:popUpToInclusive="true"/>
+    </fragment>
+</navigation>
