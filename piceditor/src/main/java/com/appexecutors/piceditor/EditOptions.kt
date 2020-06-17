@@ -17,12 +17,6 @@ class EditOptions: Serializable {
     var isCaptionCompulsory: Boolean = false
     var showThumbnail: Boolean = true
 
-    var mIconURI: String = ""
-    var mIconResource: Int = 0
-
-    //receiver name
-    var mTitle: String = ""
-
     companion object{
         @JvmStatic
         fun init(): EditOptions{

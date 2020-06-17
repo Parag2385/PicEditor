@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="ratio"
+            type="com.appexecutors.piceditor.editorengine.actions.CropAspectRatio" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/colorBlack">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/linear_layout_icon"
+            android:orientation="vertical"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/image_view_icon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="12dp"
+                android:contentDescription="@string/content_description_crop_ratio_item"
+                android:layout_gravity="center_vertical"
+                android:tint="@color/colorWhite"
+                app:imageResource="@{ratio.MIcon}"
+                tools:src="@drawable/ic_crop_rotate_black" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            app:layout_constraintTop_toBottomOf="@+id/linear_layout_icon"
+            app:layout_constraintStart_toStartOf="@+id/linear_layout_icon"
+            app:layout_constraintEnd_toEndOf="@+id/linear_layout_icon"
+            tools:text="Free"
+            android:text="@{ratio.MLabel}"
+            android:layout_marginTop="4dp"
+            android:textSize="10sp"
+            android:textColor="@color/colorWhite"
+            android:id="@+id/text_view_ratio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

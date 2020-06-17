@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
             mRequestCode = PIC_IMAGE_EDITOR_CODE
             mAddMoreImplementedListener = mAddMoreListener
             showCaption = true
+            isCaptionCompulsory = true
         }
     }
 

@@ -25,7 +25,7 @@ import kotlinx.coroutines.withContext
 /**
  * A simple [Fragment] subclass.
  */
-class CropRotateFragment : Fragment() {
+class CropRotateFragment : Fragment(), CropAspectRatioAdapter.AspectRationInterface {
 
     private lateinit var mBinding: FragmentCropRotateBinding
     private lateinit var mViewModel: PicViewModel
@@ -66,7 +66,24 @@ class CropRotateFragment : Fragment() {
 
                 override fun onLoadCleared(placeholder: Drawable?) {/*Not Required*/}
             })
+
+        setCropRatioRecyclerView()
     }
+
+    private fun setCropRatioRecyclerView(){
+        val mCropRatioList = ArrayList<CropAspectRatio>()
+        val ratio = CropAspectRatio(0, 0, "Free", R.drawable.ic_free_crop)
+        ratio.isSelected = true
+        mCropRatioList.add(ratio)
+        mCropRatioList.add(CropAspectRatio(1, 1, "Square", R.drawable.ratio_1is1))
+        mCropRatioList.add(CropAspectRatio(3, 4, "3:4", R.drawable.ratio_3is4))
+        mCropRatioList.add(CropAspectRatio(3, 2, "3:2", R.drawable.ratio_3is2))
+
+        val mCropRatioAdapter = CropAspectRatioAdapter(mCropRatioList, this)
+        mBinding.recyclerViewRatio.adapter = mCropRatioAdapter
+    }
+
+    fun rotateImage() = mBinding.cropImageView.rotateImage(90)
 
     fun doneCropping(){
         CoroutineScope(Dispatchers.Main).launch{
@@ -77,8 +94,16 @@ class CropRotateFragment : Fragment() {
                 mViewModel.mMediaPreviewList!![mViewModel.mCurrentMediaPosition].mProcessedBitmap = mCroppedBitmap
             }
             findNavController().navigate(CropRotateFragmentDirections.actionCropRotateFragmentToPicEditorFragment())
+//            findNavController().navigateUp()
         }
     }
 
     fun cancel() = findNavController().navigateUp()
+
+    override fun onAspectRatioSelected(mRatio: CropAspectRatio) {
+        if (mRatio.xCoordinate > 0)
+            mBinding.cropImageView.setAspectRatio(mRatio.xCoordinate, mRatio.yCoordinate)
+        else
+            mBinding.cropImageView.clearAspectRatio()
+    }
 }

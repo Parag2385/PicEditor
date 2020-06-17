@@ -53,6 +53,9 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface  
         loadImages()
     }
 
+    private var mMediaPreviewAdapter : MediaPreviewPagerAdapter? = null
+    private var mThumbnailAdapter : MediaThumbnailAdapter? = null
+
     private fun loadImages(){
 
         if (mViewModel.mMediaPreviewList == null){
@@ -62,18 +65,23 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface  
             mViewModel.mMediaPreviewList = mMediaPreviewList
         }
 
-        val mAdapter = MediaPreviewPagerAdapter(requireActivity(), mViewModel.mMediaPreviewList!!)
-        mBinding.viewPager.adapter = mAdapter
+        mMediaPreviewAdapter = MediaPreviewPagerAdapter(requireActivity(), mViewModel.mMediaPreviewList!!)
+        mBinding.viewPager.adapter = mMediaPreviewAdapter
 
-        val mThumbnailAdapter = MediaThumbnailAdapter(requireActivity(), mViewModel.mMediaPreviewList!!, this)
+        mThumbnailAdapter = MediaThumbnailAdapter(requireActivity(), mViewModel.mMediaPreviewList!!, this)
         mBinding.recyclerViewMedia.adapter = mThumbnailAdapter
+        mThumbnailAdapter?.mSelectedPosition = mViewModel.mCurrentMediaPosition
+
+        mBinding.viewPager.setCurrentItem(mViewModel.mCurrentMediaPosition, false)
 
         mBinding.viewPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback(){
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 mViewModel.mCurrentMediaPosition = position
-                mBinding.editTextCaption.setText(mViewModel.mMediaPreviewList!![position].mCaption)
-                mThumbnailAdapter.itemClick(position, 2)
+                if (mViewModel.mMediaPreviewList?.size!! > 0) {
+                    mBinding.editTextCaption.setText(mViewModel.mMediaPreviewList!![position].mCaption)
+                    mThumbnailAdapter?.itemClick(position, 2)
+                }
             }
         })
 
@@ -88,14 +96,24 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface  
         })
     }
 
-    fun cropImage(){
-        findNavController().navigate(R.id.action_picEditorFragment_to_cropRotateFragment)
+    fun deleteImage(){
+        if (mViewModel.mMediaPreviewList?.size!! > 1) {
+            mViewModel.mMediaPreviewList?.removeAt(mViewModel.mCurrentMediaPosition)
+            mThumbnailAdapter?.removeThumbnail(mViewModel.mCurrentMediaPosition)
+            mMediaPreviewAdapter?.notifyItemRemoved(mViewModel.mCurrentMediaPosition)
+            if (mViewModel.mCurrentMediaPosition != mViewModel.mMediaPreviewList?.size!!){
+                mBinding.editTextCaption.setText(mViewModel.mMediaPreviewList!![mViewModel.mCurrentMediaPosition].mCaption)
+                mThumbnailAdapter?.itemClick(mViewModel.mCurrentMediaPosition, 2)
+            }
+        }else onBackPress()
     }
+
+    fun cropImage() = findNavController().navigate(R.id.action_picEditorFragment_to_cropRotateFragment)
 
     fun onBackPress() = activity?.finish()
 
     override fun onThumbnailSelection(position: Int, mFrom: Int) {
-        if (mFrom == 1) mBinding.viewPager.currentItem = position
+        if (mFrom == 1) mBinding.viewPager.setCurrentItem(position, false)
     }
 
 }

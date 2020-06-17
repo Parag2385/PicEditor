@@ -13,7 +13,7 @@ import com.bumptech.glide.request.RequestOptions
 class MediaThumbnailAdapter(val mContext: Context, private val mMediaList: ArrayList<MediaPreview>, private val mInterface: ThumbnailInterface)
     : RecyclerView.Adapter<MediaThumbnailAdapter.ThumbnailViewHolder>(){
 
-    private var mSelectedPosition = RecyclerView.NO_POSITION
+    var mSelectedPosition = RecyclerView.NO_POSITION
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThumbnailViewHolder {
         val mBinding =
@@ -47,6 +47,11 @@ class MediaThumbnailAdapter(val mContext: Context, private val mMediaList: Array
         }
     }
 
+    fun removeThumbnail(position: Int){
+        notifyItemRemoved(position)
+        notifyItemRangeChanged(position, itemCount)
+    }
+
     fun itemClick(position: Int, mFrom: Int) {
 
         if (mSelectedPosition == RecyclerView.NO_POSITION) {
@@ -54,8 +59,10 @@ class MediaThumbnailAdapter(val mContext: Context, private val mMediaList: Array
             mMediaList[mSelectedPosition].isSelected = true
             notifyItemChanged(mSelectedPosition)
         } else {
-            mMediaList[mSelectedPosition].isSelected = false
-            notifyItemChanged(mSelectedPosition)
+            if (mMediaList.size > mSelectedPosition) {
+                mMediaList[mSelectedPosition].isSelected = false
+                notifyItemChanged(mSelectedPosition)
+            }
             mSelectedPosition = position
             mMediaList[mSelectedPosition].isSelected = true
             notifyItemChanged(mSelectedPosition)

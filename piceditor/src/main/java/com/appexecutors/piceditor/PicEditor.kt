@@ -15,7 +15,6 @@ class PicEditor : AppCompatActivity(){
 
     private lateinit var mBinding: ActivityPicEditorBinding
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_pic_editor)
@@ -31,7 +30,6 @@ class PicEditor : AppCompatActivity(){
                     mPicEditorIntent.putExtra(EDITOR_OPTIONS, options)
                     fragment.startActivityForResult(mPicEditorIntent, options.mRequestCode)
                 }
-
             })
         }
 

@@ -21,8 +21,19 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            app:cropGuidelines="on"
+            app:cropBorderLineColor="@color/colorGrey"
+            app:cropGuidelinesColor="@color/colorGrey"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_ratio"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_height="wrap_content"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -37,8 +48,9 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:padding="12dp"
-                android:text="Cancel"
+                android:text="@string/str_cancel"
                 android:textAllCaps="true"
+                android:background="?attr/selectableItemBackground"
                 android:onClick="@{() -> fragment.cancel()}"
                 android:textColor="@color/colorWhite" />
 
@@ -46,8 +58,11 @@
                 android:id="@+id/rotate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="12dp"
-                android:src="@drawable/ic_crop_rotate_black"
+                android:padding="8dp"
+                android:contentDescription="@string/content_description_rotate"
+                android:onClick="@{() -> fragment.rotateImage()}"
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/ic_rotate_right_black"
                 android:tint="@color/colorWhite" />
 
             <TextView
@@ -57,7 +72,8 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:padding="12dp"
-                android:text="Done"
+                android:text="@string/str_done"
+                android:background="?attr/selectableItemBackground"
                 android:onClick="@{() -> fragment.doneCropping()}"
                 android:textAllCaps="true"
                 android:textColor="@color/colorWhite" />

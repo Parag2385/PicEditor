@@ -11,9 +11,8 @@ class MediaPreviewPagerAdapter(
     fm: FragmentActivity,
     private val mMediaList: ArrayList<MediaPreview>
 ) : FragmentStateAdapter(fm) {
-    override fun getItemCount(): Int {
-        return mMediaList.size
-    }
+
+    override fun getItemCount(): Int = mMediaList.size
 
     override fun createFragment(position: Int): Fragment {
         val mBundle = Bundle()
@@ -22,5 +21,15 @@ class MediaPreviewPagerAdapter(
             ImagePreviewFragment()
         imageFragment.arguments = mBundle
         return imageFragment
+    }
+
+    private val pageIds= mMediaList.map { it.hashCode().toLong() }
+
+    override fun getItemId(position: Int): Long {
+        return mMediaList[position].hashCode().toLong() // make sure notifyDataSetChanged() works
+    }
+
+    override fun containsItem(itemId: Long): Boolean {
+        return pageIds.contains(itemId)
     }
 }

@@ -1,5 +1,19 @@
 <resources>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Content Descriptions  -->
+    <string name="content_description_rotate">Rotate Button</string>
+    <string name="content_description_editor_back">Editor Back Button</string>
+    <string name="content_description_editor_delete">Editor Delete Button</string>
+    <string name="content_description_editor_crop">Editor Crop Button</string>
+    <string name="content_description_editor_text">Editor Text Button</string>
+    <string name="content_description_editor_draw">Editor Draw Button</string>
+    <string name="content_description_crop_ratio_item">Editor Crop Ratio Buttons</string>
+    <string name="content_description_editor_thumbnail">Editor Media Thumbnail</string>
+
+    <!-- TextView Strings-->
+    <string name="str_pic_editor">PicEditor Demo</string>
+    <string name="str_cancel">Cancel</string>
+    <string name="str_done">Done</string>
+    <string name="str_add_caption">Add a caption…</string>
 </resources>
