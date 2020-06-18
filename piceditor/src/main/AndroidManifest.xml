@@ -4,6 +4,7 @@
 
     <application>
         <activity android:name=".PicEditor"
+            android:windowSoftInputMode="adjustNothing"
             android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 

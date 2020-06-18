@@ -20,4 +20,12 @@
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
+    <style name="TextEditorEditText">
+        <item name="android:singleLine">true</item>
+        <item name="colorControlNormal">#FFFFFF</item>
+        <item name="colorControlActivated">#FFFFFF</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
 </resources>

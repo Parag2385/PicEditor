@@ -58,6 +58,13 @@ dependencies {
     //crop rotate
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
 
+    implementation 'com.github.veritas1:vertical-slide-color-picker:1.0.0'
+
+    implementation 'ja.burhanrashid52:photoeditor:1.0.0'
+
+    //EventBus
+    implementation 'org.greenrobot:eventbus:3.1.1'
+
     //Navigation
     def nav_version = "2.2.2"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"

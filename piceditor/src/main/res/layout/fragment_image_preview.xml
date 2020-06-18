@@ -11,12 +11,10 @@
         android:layout_height="match_parent"
         tools:context=".editorengine.preview.ImagePreviewFragment">
 
-        <com.github.chrisbanes.photoview.PhotoView
-            android:id="@+id/photo_view"
+        <ja.burhanrashid52.photoeditor.PhotoEditorView
+            android:id="@+id/photoEditorView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true" />
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 </layout>
