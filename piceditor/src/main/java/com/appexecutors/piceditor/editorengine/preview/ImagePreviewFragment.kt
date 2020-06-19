@@ -18,6 +18,8 @@ import com.appexecutors.piceditor.editorengine.utils.AppConstants.DISABLE_BRUSH_
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDIT_TEXT_ACTION_DONE
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDIT_TEXT_ACTION_START
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.MEDIA_POSITION
+import com.appexecutors.piceditor.editorengine.utils.AppConstants.UNDO
+import com.appexecutors.piceditor.editorengine.utils.AppConstants.UNDO_REDO_ACTION
 import com.appexecutors.piceditor.editorengine.utils.GlobalEventListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -86,6 +88,10 @@ class ImagePreviewFragment : Fragment(), OnPhotoEditorListener {
         //todo: provision to add watermark
     }
 
+    private fun undo() = mPhotoEditor?.undo()
+
+    private fun redo() = mPhotoEditor?.redo()
+
 
     @Subscribe
     fun onGlobalEventListener(mEvent: GlobalEventListener){
@@ -111,6 +117,9 @@ class ImagePreviewFragment : Fragment(), OnPhotoEditorListener {
                 styleBuilder.withTextColor(mEvent.mTextColor)
                 if (mClickedTextView != null)
                 mPhotoEditor?.editText(mClickedTextView!!, mEvent.mText, styleBuilder)
+            }
+            UNDO_REDO_ACTION ->{
+                if (mEvent.mUndoRedoFlag == UNDO) undo() else redo()
             }
         }
     }

@@ -5,4 +5,6 @@ data class GlobalEventListener(
 ){
     var mText: String = ""
     var mTextColor: Int = 0
+
+    var mUndoRedoFlag: Int = 0
 }

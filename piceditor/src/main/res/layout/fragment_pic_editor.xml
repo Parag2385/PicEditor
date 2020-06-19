@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@drawable/background_black_alpha"
+            android:background="@color/colorBlack70"
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
@@ -46,6 +46,40 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/image_view_back"
+                android:layout_marginStart="8dp"
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/image_view_undo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_undo_black"
+                    style="@style/EditorImage"
+                    android:onClick="@{()-> fragment.undoRedo(1)}"
+                    android:contentDescription="@string/content_description_editor_undo"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/image_view_back"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/image_view_redo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_redo_black"
+                    style="@style/EditorImage"
+                    android:onClick="@{()-> fragment.undoRedo(2)}"
+                    android:contentDescription="@string/content_description_editor_redo"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/image_view_undo"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </LinearLayout>
 
             <ImageView
                 android:id="@+id/image_view_delete"

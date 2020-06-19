@@ -57,9 +57,11 @@ class PicEditor : AppCompatActivity(){
                         if (mPicEditor.mPickedTool == ToolType.BRUSH){
                             mPicEditor.brushDone()
                             mPicEditor.animateBackIcon(true)
+                            mPicEditor.mPickedTool = ToolType.NONE
                         }else if (mPicEditor.mPickedTool == ToolType.TEXT || mPicEditor.mPickedTool == ToolType.TEXT_EDIT){
                             mPicEditor.clearText(INTENT_FROM_PIC_EDITOR)
                             mPicEditor.animateBackIcon(true)
+                            mPicEditor.mPickedTool = ToolType.NONE
                         }else if (mPicEditor.mPickedTool == ToolType.NONE){
                             super.onBackPressed()
                         }

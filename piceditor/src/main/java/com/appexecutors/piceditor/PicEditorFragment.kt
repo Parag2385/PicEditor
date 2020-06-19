@@ -6,7 +6,6 @@ import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.*
@@ -32,6 +31,7 @@ import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDIT_TEXT_ACTI
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDIT_TEXT_ACTION_START
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.INTENT_FROM_PIC_EDITOR
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.INTENT_FROM_PIC_EDITOR_FRAGMENT
+import com.appexecutors.piceditor.editorengine.utils.AppConstants.UNDO_REDO_ACTION
 import com.appexecutors.piceditor.editorengine.utils.GlobalEventListener
 import com.appexecutors.piceditor.editorengine.utils.ToolType
 import com.appexecutors.piceditor.editorengine.utils.Utils
@@ -237,8 +237,21 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
 
     fun onBackPress() = activity?.onBackPressed()
 
+    fun undoRedo(mFlag: Int){
+        val event = GlobalEventListener(UNDO_REDO_ACTION)
+        event.mUndoRedoFlag = mFlag
+        EventBus.getDefault().post(event)
+    }
+
     override fun onThumbnailSelection(position: Int, mFrom: Int) {
-        if (mFrom == 1) mBinding.viewPager.setCurrentItem(position, false)
+        if (mFrom == 1){
+            if (mPickedTool != ToolType.NONE) {
+                clearBrush()
+                animateBackIcon(true)
+                mBinding.colorPicker.visibility = INVISIBLE
+            }
+            mBinding.viewPager.setCurrentItem(position, false)
+        }
     }
 
     fun animateBackIcon(showBack: Boolean){
@@ -296,12 +309,9 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
     }
 
     override fun onKeyboardHeightChanged(height: Int, orientation: Int) {
-        Log.e("PicEditorFragment", "onKeyboardHeightChanged: in pixels: $height")
 
         if (height > 0 && mPickedTool == ToolType.TEXT_CAPTION){
-
             val finalHeight = height - mBinding.recyclerViewMedia.height
-
             val params = mBinding.constraintLayoutCaption.layoutParams as ViewGroup.MarginLayoutParams
             params.setMargins(0, 0, 0, finalHeight)
             mBinding.constraintLayoutCaption.layoutParams = params

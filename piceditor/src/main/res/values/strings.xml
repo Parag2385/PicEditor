@@ -10,6 +10,8 @@
     <string name="content_description_editor_draw">Editor Draw Button</string>
     <string name="content_description_crop_ratio_item">Editor Crop Ratio Buttons</string>
     <string name="content_description_editor_thumbnail">Editor Media Thumbnail</string>
+    <string name="content_description_editor_undo">Editor Undo Button</string>
+    <string name="content_description_editor_redo">Editor Redo Button</string>
 
     <!-- TextView Strings-->
     <string name="str_pic_editor">PicEditor Demo</string>

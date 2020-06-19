@@ -3,12 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="fragment"
+            type="com.appexecutors.piceditor.editorengine.preview.ImagePreviewFragment" />
     </data>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/colorBlack"
         tools:context=".editorengine.preview.ImagePreviewFragment">
 
         <ja.burhanrashid52.photoeditor.PhotoEditorView
@@ -16,5 +19,5 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
