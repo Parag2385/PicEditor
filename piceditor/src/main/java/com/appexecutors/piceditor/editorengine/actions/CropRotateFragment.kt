@@ -48,25 +48,32 @@ class CropRotateFragment : Fragment(), CropAspectRatioAdapter.AspectRationInterf
 
         mBinding.fragment = this
 
-        loadImage(mViewModel.mMediaPreviewList!![mViewModel.mCurrentMediaPosition].mMediaUri)
+        loadImage()
     }
 
-    private fun loadImage(mImageUri: String?){
-        Glide.with(this)
-            .setDefaultRequestOptions(RequestOptions())
-            .asBitmap()
-            .load(mImageUri)
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(
-                    resource: Bitmap,
-                    transition: Transition<in Bitmap>?
-                ) {
-                    mBinding.cropImageView.setImageBitmap(resource)
-                }
+    private fun loadImage(){
+        val mProcessedBitmap = mViewModel.mMediaPreviewList!![mViewModel.mCurrentMediaPosition].mProcessedBitmap
+        if (mProcessedBitmap != null){
+            mBinding.cropImageView.setImageBitmap(mProcessedBitmap)
+        }else {
+            val mImageUri = mViewModel.mMediaPreviewList!![mViewModel.mCurrentMediaPosition].mMediaUri
 
-                override fun onLoadCleared(placeholder: Drawable?) {/*Not Required*/}
-            })
+            Glide.with(this)
+                .setDefaultRequestOptions(RequestOptions())
+                .asBitmap()
+                .load(mImageUri)
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: Transition<in Bitmap>?
+                    ) {
+                        mBinding.cropImageView.setImageBitmap(resource)
+                    }
 
+                    override fun onLoadCleared(placeholder: Drawable?) {/*Not Required*/}
+                })
+
+        }
         setCropRatioRecyclerView()
     }
 
@@ -94,11 +101,10 @@ class CropRotateFragment : Fragment(), CropAspectRatioAdapter.AspectRationInterf
                 mViewModel.mMediaPreviewList!![mViewModel.mCurrentMediaPosition].mProcessedBitmap = mCroppedBitmap
             }
             findNavController().navigate(CropRotateFragmentDirections.actionCropRotateFragmentToPicEditorFragment())
-//            findNavController().navigateUp()
         }
     }
 
-    fun cancel() = findNavController().navigateUp()
+    fun cancel() = findNavController().navigate(CropRotateFragmentDirections.actionCropRotateFragmentToPicEditorFragment())
 
     override fun onAspectRatioSelected(mRatio: CropAspectRatio) {
         if (mRatio.xCoordinate > 0)

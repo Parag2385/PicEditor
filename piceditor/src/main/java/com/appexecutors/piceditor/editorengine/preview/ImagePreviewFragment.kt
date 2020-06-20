@@ -1,5 +1,6 @@
 package com.appexecutors.piceditor.editorengine.preview
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,15 +19,13 @@ import com.appexecutors.piceditor.editorengine.utils.AppConstants.DISABLE_BRUSH_
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDIT_TEXT_ACTION_DONE
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDIT_TEXT_ACTION_START
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.MEDIA_POSITION
+import com.appexecutors.piceditor.editorengine.utils.AppConstants.SAVE_BITMAP_FOR_CROP_ACTION_DONE
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.UNDO
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.UNDO_REDO_ACTION
 import com.appexecutors.piceditor.editorengine.utils.GlobalEventListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import ja.burhanrashid52.photoeditor.OnPhotoEditorListener
-import ja.burhanrashid52.photoeditor.PhotoEditor
-import ja.burhanrashid52.photoeditor.TextStyleBuilder
-import ja.burhanrashid52.photoeditor.ViewType
+import ja.burhanrashid52.photoeditor.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 
@@ -69,13 +68,15 @@ class ImagePreviewFragment : Fragment(), OnPhotoEditorListener {
             }
         }
 
-        mPhotoEditor = PhotoEditor.Builder(requireContext(), mBinding.photoEditorView)
-            .setPinchTextScalable(true)
-            .build() // build photo editor sdk
+        if (mPhotoEditor == null) {
+
+            mPhotoEditor = PhotoEditor.Builder(requireContext(), mBinding.photoEditorView)
+                .setPinchTextScalable(true)
+                .build() // build photo editor sdk
 
 
-        mPhotoEditor?.setOnPhotoEditorListener(this)
-
+            mPhotoEditor?.setOnPhotoEditorListener(this)
+        }
 
     }
 
@@ -92,9 +93,22 @@ class ImagePreviewFragment : Fragment(), OnPhotoEditorListener {
 
     private fun redo() = mPhotoEditor?.redo()
 
+    fun saveBitmap(){
+        mPhotoEditor?.saveAsBitmap(object: OnSaveBitmap{
+            override fun onFailure(e: Exception?) {
+                //
+            }
 
+            override fun onBitmapReady(saveBitmap: Bitmap?) {
+                mViewModel.mMediaPreviewList!![mViewModel.mCurrentMediaPosition].mProcessedBitmap = saveBitmap
+                EventBus.getDefault().post(GlobalEventListener(SAVE_BITMAP_FOR_CROP_ACTION_DONE))
+            }
+        })
+    }
+    
     @Subscribe
     fun onGlobalEventListener(mEvent: GlobalEventListener){
+
         if (mCurrentPosition != mViewModel.mCurrentMediaPosition) return
 
         when (mEvent.mActionID) {

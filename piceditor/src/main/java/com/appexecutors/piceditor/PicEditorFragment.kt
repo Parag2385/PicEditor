@@ -19,6 +19,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.appexecutors.piceditor.databinding.FragmentPicEditorBinding
 import com.appexecutors.piceditor.editorengine.PicViewModel
 import com.appexecutors.piceditor.editorengine.models.MediaPreview
+import com.appexecutors.piceditor.editorengine.preview.ImagePreviewFragment
 import com.appexecutors.piceditor.editorengine.preview.MediaPreviewPagerAdapter
 import com.appexecutors.piceditor.editorengine.preview.MediaThumbnailAdapter
 import com.appexecutors.piceditor.editorengine.utils.AppConstants
@@ -31,6 +32,7 @@ import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDIT_TEXT_ACTI
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDIT_TEXT_ACTION_START
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.INTENT_FROM_PIC_EDITOR
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.INTENT_FROM_PIC_EDITOR_FRAGMENT
+import com.appexecutors.piceditor.editorengine.utils.AppConstants.SAVE_BITMAP_FOR_CROP_ACTION_DONE
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.UNDO_REDO_ACTION
 import com.appexecutors.piceditor.editorengine.utils.GlobalEventListener
 import com.appexecutors.piceditor.editorengine.utils.ToolType
@@ -158,7 +160,10 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
         }else onBackPress()
     }
 
-    fun cropImage() = findNavController().navigate(R.id.action_picEditorFragment_to_cropRotateFragment)
+    fun cropImage(){
+        val mImageFragment = mMediaPreviewAdapter?.getCurrentFragment(mViewModel.mCurrentMediaPosition) as ImagePreviewFragment
+        mImageFragment.saveBitmap()
+    }
 
     var mPickedTool = ToolType.NONE
 
@@ -273,7 +278,7 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
     }
 
     private fun captionClickListener(){
-        mBinding.editTextCaption.setOnFocusChangeListener { v, hasFocus ->
+        mBinding.editTextCaption.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) mPickedTool = ToolType.TEXT_CAPTION
         }
         mBinding.editTextCaption.setOnClickListener {
@@ -295,6 +300,7 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
             }
             ACTION_STARTED -> mBinding.viewPager.isUserInputEnabled = false
             ACTION_STOPPED -> mBinding.viewPager.isUserInputEnabled = true
+            SAVE_BITMAP_FOR_CROP_ACTION_DONE -> findNavController().navigate(R.id.action_picEditorFragment_to_cropRotateFragment)
         }
     }
 

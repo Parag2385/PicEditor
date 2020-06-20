@@ -12,6 +12,8 @@ class MediaPreviewPagerAdapter(
     private val mMediaList: ArrayList<MediaPreview>
 ) : FragmentStateAdapter(fm) {
 
+    private val mFragmentList: MutableList<Fragment> = mutableListOf()
+
     override fun getItemCount(): Int = mMediaList.size
 
     override fun createFragment(position: Int): Fragment {
@@ -20,6 +22,7 @@ class MediaPreviewPagerAdapter(
         val imageFragment =
             ImagePreviewFragment()
         imageFragment.arguments = mBundle
+        mFragmentList.add(imageFragment)
         return imageFragment
     }
 
@@ -31,5 +34,9 @@ class MediaPreviewPagerAdapter(
 
     override fun containsItem(itemId: Long): Boolean {
         return pageIds.contains(itemId)
+    }
+
+    fun getCurrentFragment(position: Int): Fragment{
+        return mFragmentList[position]
     }
 }
