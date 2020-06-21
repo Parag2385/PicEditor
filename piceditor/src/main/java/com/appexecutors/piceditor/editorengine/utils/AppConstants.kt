@@ -23,4 +23,6 @@ object AppConstants {
 
     const val UNDO = 1
 
+    const val EDITED_MEDIA_LIST = "EDITED_MEDIA_LIST"
+
 }

@@ -1,6 +1,8 @@
 package com.appexecutors.piceditor
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
@@ -18,6 +20,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.appexecutors.piceditor.databinding.FragmentPicEditorBinding
 import com.appexecutors.piceditor.editorengine.PicViewModel
+import com.appexecutors.piceditor.editorengine.models.MediaFinal
 import com.appexecutors.piceditor.editorengine.models.MediaPreview
 import com.appexecutors.piceditor.editorengine.preview.ImagePreviewFragment
 import com.appexecutors.piceditor.editorengine.preview.MediaPreviewPagerAdapter
@@ -28,6 +31,7 @@ import com.appexecutors.piceditor.editorengine.utils.AppConstants.ACTION_STOPPED
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.ADD_BRUSH_ACTION
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.ADD_TEXT_ACTION
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.DISABLE_BRUSH_ACTION
+import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDITED_MEDIA_LIST
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDIT_TEXT_ACTION_DONE
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDIT_TEXT_ACTION_START
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.INTENT_FROM_PIC_EDITOR
@@ -39,6 +43,7 @@ import com.appexecutors.piceditor.editorengine.utils.ToolType
 import com.appexecutors.piceditor.editorengine.utils.Utils
 import com.appexecutors.piceditor.editorengine.utils.keyboard.KeyboardHeightObserver
 import com.appexecutors.piceditor.editorengine.utils.keyboard.KeyboardHeightProvider
+import kotlinx.coroutines.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 
@@ -104,6 +109,7 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
 
         mMediaPreviewAdapter = MediaPreviewPagerAdapter(requireActivity(), mViewModel.mMediaPreviewList!!)
         mBinding.viewPager.adapter = mMediaPreviewAdapter
+        mBinding.viewPager.offscreenPageLimit = mViewModel.mMediaPreviewList?.size!!
 
         mThumbnailAdapter = MediaThumbnailAdapter(requireActivity(), mViewModel.mMediaPreviewList!!, this)
         mBinding.recyclerViewMedia.adapter = mThumbnailAdapter
@@ -161,8 +167,8 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
     }
 
     fun cropImage(){
-        val mImageFragment = mMediaPreviewAdapter?.getCurrentFragment(mViewModel.mCurrentMediaPosition) as ImagePreviewFragment
-        mImageFragment.saveBitmap()
+        val mImageFragment = mMediaPreviewAdapter?.getCurrentFragment(mViewModel.mCurrentMediaPosition) as ImagePreviewFragment?
+        mImageFragment?.saveSingleBitmap()
     }
 
     var mPickedTool = ToolType.NONE
@@ -284,6 +290,31 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
         mBinding.editTextCaption.setOnClickListener {
             mPickedTool = ToolType.TEXT_CAPTION
         }
+    }
+
+    fun editDone(){
+
+        mViewModel.mMediaFinalList = ArrayList()
+
+        CoroutineScope(Dispatchers.Main).launch {
+
+            mViewModel.mMediaPreviewList?.mapIndexed { i, media ->
+                async(Dispatchers.IO){
+                    val mImageFragment = mMediaPreviewAdapter?.getCurrentFragment(i) as ImagePreviewFragment
+                    val path = mImageFragment.saveBitmap()
+
+                    val mediaFinal = MediaFinal(path)
+                    mediaFinal.mCaption = media.mCaption
+                    mViewModel.mMediaFinalList?.add(mediaFinal)
+                }
+            }?.awaitAll()
+
+            val intent = Intent()
+            intent.putExtra(EDITED_MEDIA_LIST, mViewModel.mMediaFinalList)
+            requireActivity().setResult(RESULT_OK, intent)
+            requireActivity().finish()
+        }
+
     }
 
     private var mClickedText = ""

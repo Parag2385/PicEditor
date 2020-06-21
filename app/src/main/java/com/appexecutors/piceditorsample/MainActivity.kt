@@ -3,11 +3,14 @@ package com.appexecutors.piceditorsample
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.appexecutors.piceditor.EditOptions
 import com.appexecutors.piceditor.PicEditor
 import com.appexecutors.piceditor.editorengine.AddMoreImagesListener
+import com.appexecutors.piceditor.editorengine.models.MediaFinal
+import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDITED_MEDIA_LIST
 import com.appexecutors.piceditorsample.AppConstants.PIC_IMAGE_EDITOR_CODE
 import com.appexecutors.piceditorsample.AppConstants.PIX_IMAGE_PICKER_CODE
 import com.appexecutors.piceditorsample.databinding.ActivityMainBinding
@@ -25,7 +28,7 @@ class MainActivity : AppCompatActivity() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         mBinding.fab.setOnClickListener {
-            Pix.start(this, Options.init().setRequestCode(PIX_IMAGE_PICKER_CODE).setCount(5))
+            Pix.start(this, Options.init().setRequestCode(PIX_IMAGE_PICKER_CODE).setCount(10))
         }
 
         mEditOptions = EditOptions.init().apply {
@@ -44,6 +47,18 @@ class MainActivity : AppCompatActivity() {
                 this,
                 mEditOptions
             )
+        }
+
+        if (resultCode == Activity.RESULT_OK && requestCode == mEditOptions.mRequestCode){
+            @Suppress("UNCHECKED_CAST")
+            val mEditedList = data?.getSerializableExtra(EDITED_MEDIA_LIST) as ArrayList<MediaFinal>?
+
+            if (mEditedList != null) {
+                for (i in 0 until mEditedList.size) {
+                    Log.e("MainActivity", "onActivityResult: ${mEditedList[i].mMediaUri}")
+                }
+            }
+
         }
     }
 

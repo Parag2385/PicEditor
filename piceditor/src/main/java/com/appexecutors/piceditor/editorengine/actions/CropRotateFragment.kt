@@ -3,6 +3,7 @@ package com.appexecutors.piceditor.editorengine.actions
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,6 +53,7 @@ class CropRotateFragment : Fragment(), CropAspectRatioAdapter.AspectRationInterf
     }
 
     private fun loadImage(){
+        Log.e("CropRotateFragment", "loadImage: ${mViewModel.mCurrentMediaPosition}")
         val mProcessedBitmap = mViewModel.mMediaPreviewList!![mViewModel.mCurrentMediaPosition].mProcessedBitmap
         if (mProcessedBitmap != null){
             mBinding.cropImageView.setImageBitmap(mProcessedBitmap)

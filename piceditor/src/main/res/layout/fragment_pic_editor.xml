@@ -178,6 +178,7 @@
                 android:src="@drawable/ic_check_black"
                 app:borderWidth="0dp"
                 app:fabCustomSize="48dp"
+                android:onClick="@{()-> fragment.editDone()}"
                 app:layout_constraintBottom_toBottomOf="@+id/view_anchor"
                 app:layout_constraintEnd_toEndOf="@+id/view_anchor"
                 app:layout_constraintTop_toTopOf="@+id/view_anchor"

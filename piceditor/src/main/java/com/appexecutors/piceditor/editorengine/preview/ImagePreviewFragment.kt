@@ -2,6 +2,7 @@ package com.appexecutors.piceditor.editorengine.preview
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,11 +24,15 @@ import com.appexecutors.piceditor.editorengine.utils.AppConstants.SAVE_BITMAP_FO
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.UNDO
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.UNDO_REDO_ACTION
 import com.appexecutors.piceditor.editorengine.utils.GlobalEventListener
+import com.appexecutors.piceditor.editorengine.utils.Utils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import ja.burhanrashid52.photoeditor.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+
 
 /**
  * A simple [Fragment] subclass.
@@ -93,18 +98,37 @@ class ImagePreviewFragment : Fragment(), OnPhotoEditorListener {
 
     private fun redo() = mPhotoEditor?.redo()
 
-    fun saveBitmap(){
+    private val saveSettings = SaveSettings.Builder()
+        .setClearViewsEnabled(true)
+        .setTransparencyEnabled(true)
+        .setCompressFormat(Bitmap.CompressFormat.JPEG)
+        .setCompressQuality(70)
+        .build()
+
+    fun saveSingleBitmap(){
+
         mPhotoEditor?.saveAsBitmap(object: OnSaveBitmap{
-            override fun onFailure(e: Exception?) {
-                //
-            }
+            override fun onFailure(e: Exception?) {/*Not Required*/}
 
             override fun onBitmapReady(saveBitmap: Bitmap?) {
-                mViewModel.mMediaPreviewList!![mViewModel.mCurrentMediaPosition].mProcessedBitmap = saveBitmap
+                mViewModel.mMediaPreviewList!![mCurrentPosition].mProcessedBitmap = saveBitmap
                 EventBus.getDefault().post(GlobalEventListener(SAVE_BITMAP_FOR_CROP_ACTION_DONE))
             }
         })
     }
+
+    suspend fun saveBitmap(): String =
+        suspendCoroutine {
+            mPhotoEditor?.saveAsBitmap(saveSettings, object: OnSaveBitmap{
+                override fun onFailure(e: Exception?) {/*Not Required*/}
+
+                override fun onBitmapReady(saveBitmap: Bitmap?) {
+                    Log.e("ImagePreviewFragment", "onBitmapReady: ")
+                    val mFilePath = Utils.saveImage(saveBitmap!!, requireActivity())
+                    it.resume(mFilePath!!)
+                }
+            })
+        }
     
     @Subscribe
     fun onGlobalEventListener(mEvent: GlobalEventListener){
