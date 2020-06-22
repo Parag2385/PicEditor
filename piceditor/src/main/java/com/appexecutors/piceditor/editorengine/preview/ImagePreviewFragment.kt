@@ -1,8 +1,8 @@
 package com.appexecutors.piceditor.editorengine.preview
 
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,11 +25,17 @@ import com.appexecutors.piceditor.editorengine.utils.AppConstants.UNDO
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.UNDO_REDO_ACTION
 import com.appexecutors.piceditor.editorengine.utils.GlobalEventListener
 import com.appexecutors.piceditor.editorengine.utils.Utils
+import com.appexecutors.piceditor.editorengine.utils.WatermarkType
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import ja.burhanrashid52.photoeditor.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -90,8 +96,6 @@ class ImagePreviewFragment : Fragment(), OnPhotoEditorListener {
             .setDefaultRequestOptions(RequestOptions())
             .load(mImageUri)
             .into(mBinding.photoEditorView.source)
-
-        //todo: provision to add watermark
     }
 
     private fun undo() = mPhotoEditor?.undo()
@@ -106,15 +110,18 @@ class ImagePreviewFragment : Fragment(), OnPhotoEditorListener {
         .build()
 
     fun saveSingleBitmap(){
+        CoroutineScope(Dispatchers.Main).launch {
+            withContext(Dispatchers.IO){
+                mPhotoEditor?.saveAsBitmap(object : OnSaveBitmap {
+                    override fun onFailure(e: Exception?) {/*Not Required*/}
 
-        mPhotoEditor?.saveAsBitmap(object: OnSaveBitmap{
-            override fun onFailure(e: Exception?) {/*Not Required*/}
-
-            override fun onBitmapReady(saveBitmap: Bitmap?) {
-                mViewModel.mMediaPreviewList!![mCurrentPosition].mProcessedBitmap = saveBitmap
-                EventBus.getDefault().post(GlobalEventListener(SAVE_BITMAP_FOR_CROP_ACTION_DONE))
+                    override fun onBitmapReady(saveBitmap: Bitmap?) {
+                        mViewModel.mMediaPreviewList!![mCurrentPosition].mProcessedBitmap = saveBitmap
+                        EventBus.getDefault().post(GlobalEventListener(SAVE_BITMAP_FOR_CROP_ACTION_DONE))
+                    }
+                })
             }
-        })
+        }
     }
 
     suspend fun saveBitmap(): String =
@@ -123,9 +130,32 @@ class ImagePreviewFragment : Fragment(), OnPhotoEditorListener {
                 override fun onFailure(e: Exception?) {/*Not Required*/}
 
                 override fun onBitmapReady(saveBitmap: Bitmap?) {
-                    Log.e("ImagePreviewFragment", "onBitmapReady: ")
-                    val mFilePath = Utils.saveImage(saveBitmap!!, requireActivity())
-                    it.resume(mFilePath!!)
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        when (mViewModel.mEditOptions?.mWatermarkType) {
+                            WatermarkType.NONE -> {
+                                val mFilePath = withContext(Dispatchers.IO) {
+                                    Utils.saveImage(saveBitmap!!, requireActivity())
+                                }
+                                it.resume(mFilePath!!)
+                            }
+                            WatermarkType.DATE -> {
+                                val stringDate = Utils.getStringDate("dd/MM/yyyy hh:mm a", Date())
+                                val bitmapWithWatermark = Utils.waterMark(saveBitmap!!, stringDate, Color.BLACK, 0, 10f)
+                                val mFilePath = withContext(Dispatchers.IO) {
+                                    Utils.saveImage(bitmapWithWatermark!!, requireActivity())
+                                }
+                                it.resume(mFilePath!!)
+                            }
+                            WatermarkType.TEXT -> {
+                                val bitmapWithWatermark = Utils.waterMark(saveBitmap!!, mViewModel.mEditOptions?.mWatermarkText, Color.BLACK, 0, 10f)
+                                val mFilePath = withContext(Dispatchers.IO) {
+                                    Utils.saveImage(bitmapWithWatermark!!, requireActivity())
+                                }
+                                it.resume(mFilePath!!)
+                            }
+                        }
+                    }
                 }
             })
         }

@@ -87,6 +87,7 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
 
         mBinding.fragment = this
         mBinding.options = mEditOptions
+        mViewModel.mEditOptions = mEditOptions
 
         loadImages()
 
@@ -201,7 +202,6 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
         if (mIntentFrom == INTENT_FROM_PIC_EDITOR) mBinding.colorPicker.visibility = INVISIBLE
     }
 
-
     fun startBrush(){
         setTool(ToolType.BRUSH)
         val event = GlobalEventListener(ADD_BRUSH_ACTION)
@@ -218,7 +218,6 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
 
     private fun clearBrush(){
         mBinding.imageViewDraw.setBackgroundResource(android.R.color.transparent)
-
         val event = GlobalEventListener(DISABLE_BRUSH_ACTION)
         EventBus.getDefault().post(event)
     }

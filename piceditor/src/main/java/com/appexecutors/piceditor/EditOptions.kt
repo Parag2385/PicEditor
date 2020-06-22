@@ -1,6 +1,7 @@
 package com.appexecutors.piceditor
 
 import com.appexecutors.piceditor.editorengine.AddMoreImagesListener
+import com.appexecutors.piceditor.editorengine.utils.WatermarkType
 import java.io.Serializable
 
 class EditOptions: Serializable {
@@ -16,6 +17,10 @@ class EditOptions: Serializable {
     var showCaption: Boolean = false
     var isCaptionCompulsory: Boolean = false
     var showThumbnail: Boolean = true
+    var mWatermarkType: WatermarkType = WatermarkType.NONE
+
+    //if WatermarkType.TEXT
+    var mWatermarkText: String = ""
 
     companion object{
         @JvmStatic
