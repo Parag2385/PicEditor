@@ -25,7 +25,7 @@ import com.appexecutors.piceditor.editorengine.models.MediaPreview
 import com.appexecutors.piceditor.editorengine.preview.ImagePreviewFragment
 import com.appexecutors.piceditor.editorengine.preview.MediaPreviewPagerAdapter
 import com.appexecutors.piceditor.editorengine.preview.MediaThumbnailAdapter
-import com.appexecutors.piceditor.editorengine.utils.AppConstants
+import com.appexecutors.piceditor.editorengine.utils.*
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.ACTION_STARTED
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.ACTION_STOPPED
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.ADD_BRUSH_ACTION
@@ -38,9 +38,6 @@ import com.appexecutors.piceditor.editorengine.utils.AppConstants.INTENT_FROM_PI
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.INTENT_FROM_PIC_EDITOR_FRAGMENT
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.SAVE_BITMAP_FOR_CROP_ACTION_DONE
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.UNDO_REDO_ACTION
-import com.appexecutors.piceditor.editorengine.utils.GlobalEventListener
-import com.appexecutors.piceditor.editorengine.utils.ToolType
-import com.appexecutors.piceditor.editorengine.utils.Utils
 import com.appexecutors.piceditor.editorengine.utils.keyboard.KeyboardHeightObserver
 import com.appexecutors.piceditor.editorengine.utils.keyboard.KeyboardHeightProvider
 import kotlinx.coroutines.*
@@ -55,7 +52,7 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
     KeyboardHeightObserver {
 
     private lateinit var mBinding: FragmentPicEditorBinding
-    private lateinit var mEditOptions: EditOptions
+    lateinit var mEditOptions: EditOptions
     private lateinit var mInputMethodManager: InputMethodManager
     private lateinit var mViewModel: PicViewModel
     private lateinit var keyboardHeightProvider: KeyboardHeightProvider
@@ -82,16 +79,21 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
             ViewModelProvider(requireActivity()).get(PicViewModel::class.java)
         }
 
+        mInputMethodManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
         if (requireActivity().intent != null)
             mEditOptions = requireActivity().intent.getSerializableExtra(AppConstants.EDITOR_OPTIONS) as EditOptions
+
+        initAll()
+    }
+
+    fun initAll(){
 
         mBinding.fragment = this
         mBinding.options = mEditOptions
         mViewModel.mEditOptions = mEditOptions
 
         loadImages()
-
-        mInputMethodManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
 
     private var mMediaPreviewAdapter : MediaPreviewPagerAdapter? = null
@@ -103,7 +105,12 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
 
         if (mViewModel.mMediaPreviewList == null){
             val mMediaPreviewList = ArrayList<MediaPreview>()
-            for (mediaUri in mEditOptions.mSelectedImageList) mMediaPreviewList.add(MediaPreview(mediaUri))
+            for (media in mEditOptions.mSelectedImageList){
+                val mMediaPreview = MediaPreview(media.mMediaUri)
+                mMediaPreview.mOldMediaUri = if (media.mOldMediaUri.isNotEmpty())  media.mOldMediaUri else media.mMediaUri
+                mMediaPreview.mCaption = media.mCaption
+                mMediaPreviewList.add(mMediaPreview)
+            }
 
             mViewModel.mMediaPreviewList = mMediaPreviewList
         }
@@ -153,6 +160,19 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
         }
 
         captionClickListener()
+    }
+
+    fun addMore(){
+        clearBrush()
+        CoroutineScope(Dispatchers.Main).launch {
+            getAllImages(false)
+            mViewModel.mMediaPreviewList?.mapIndexed{ i, media ->
+                mViewModel.mMediaFinalList!![i].mOldMediaUri = media.mOldMediaUri
+            }
+            mEditOptions.mSelectedImageList = mViewModel.mMediaFinalList!!
+            mViewModel.mMediaPreviewList = null
+            (requireActivity() as PicEditor).addMoreImages()
+        }
     }
 
     fun deleteImage(){
@@ -296,7 +316,20 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
         mViewModel.mMediaFinalList = ArrayList()
 
         CoroutineScope(Dispatchers.Main).launch {
+            getAllImages(true)
+            val intent = Intent()
+            intent.putExtra(EDITED_MEDIA_LIST, mViewModel.mMediaFinalList)
+            requireActivity().setResult(RESULT_OK, intent)
+            requireActivity().finish()
+        }
 
+    }
+
+    private suspend fun getAllImages(mEditDone: Boolean){
+        mViewModel.mMediaFinalList = ArrayList()
+        val currentWatermarkType = mViewModel.mEditOptions?.mWatermarkType!!
+        if (!mEditDone) mViewModel.mEditOptions?.mWatermarkType = WatermarkType.NONE
+        coroutineScope{
             mViewModel.mMediaPreviewList?.mapIndexed { i, media ->
                 async(Dispatchers.IO){
                     val mImageFragment = mMediaPreviewAdapter?.getCurrentFragment(i) as ImagePreviewFragment
@@ -304,14 +337,11 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
 
                     val mediaFinal = MediaFinal(path)
                     mediaFinal.mCaption = media.mCaption
+                    mediaFinal.mOldMediaUri = media.mOldMediaUri
                     mViewModel.mMediaFinalList?.add(mediaFinal)
                 }
             }?.awaitAll()
-
-            val intent = Intent()
-            intent.putExtra(EDITED_MEDIA_LIST, mViewModel.mMediaFinalList)
-            requireActivity().setResult(RESULT_OK, intent)
-            requireActivity().finish()
+            mViewModel.mEditOptions?.mWatermarkType = currentWatermarkType
         }
 
     }

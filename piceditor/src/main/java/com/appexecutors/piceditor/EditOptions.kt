@@ -1,12 +1,13 @@
 package com.appexecutors.piceditor
 
 import com.appexecutors.piceditor.editorengine.AddMoreImagesListener
+import com.appexecutors.piceditor.editorengine.models.MediaFinal
 import com.appexecutors.piceditor.editorengine.utils.WatermarkType
 import java.io.Serializable
 
 class EditOptions: Serializable {
 
-    var mSelectedImageList = ArrayList<String>()
+    var mSelectedImageList = ArrayList<MediaFinal>()
     var mRequestCode = 0
     var mAddMoreImplementedListener: AddMoreImagesListener? = null
 

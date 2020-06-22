@@ -142,6 +142,34 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@+id/recycler_view_media">
 
+
+            <ImageView
+                android:id="@+id/image_view_add_more"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:src="@drawable/ic_photo_black"
+                android:tint="@color/colorWhite"
+                android:paddingStart="8dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="8dp"
+                android:background="@drawable/background_black_alpha"
+                android:onClick="@{() -> fragment.addMore()}"
+                android:contentDescription="@string/content_description_editor_delete"
+                android:visibility="@{options.showDeleteOption ? View.VISIBLE: View.GONE}"
+                app:layout_constraintBottom_toBottomOf="@+id/edit_text_caption"
+                app:layout_constraintTop_toTopOf="@+id/edit_text_caption"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <View
+                app:layout_constraintStart_toStartOf="@+id/edit_text_caption"
+                app:layout_constraintTop_toTopOf="@+id/edit_text_caption"
+                app:layout_constraintBottom_toBottomOf="@+id/edit_text_caption"
+                android:layout_width="1dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/colorWhite"
+                android:layout_height="0dp"/>
+
             <EditText
                 android:id="@+id/edit_text_caption"
                 android:layout_width="0dp"
@@ -160,7 +188,7 @@
                 android:textColorHint="@color/colorWhite"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toEndOf="@+id/image_view_add_more"/>
 
             <View
                 android:id="@+id/view_anchor"

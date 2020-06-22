@@ -10,4 +10,6 @@ data class MediaPreview(
     var isSelected: Boolean = false
 
     var mProcessedBitmap: Bitmap? = null
+
+    var mOldMediaUri: String = ""
 }

@@ -1,25 +1,73 @@
 package com.appexecutors.piceditor
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelProvider
 import com.appexecutors.piceditor.databinding.ActivityPicEditorBinding
+import com.appexecutors.piceditor.editorengine.PicViewModel
 import com.appexecutors.piceditor.editorengine.interfaces.PermissionCallback
+import com.appexecutors.piceditor.editorengine.models.MediaFinal
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDITOR_OPTIONS
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.INTENT_FROM_PIC_EDITOR
+import com.appexecutors.piceditor.editorengine.utils.AppConstants.PIC_IMAGE_EDITOR_CODE
 import com.appexecutors.piceditor.editorengine.utils.PermissionUtils
 import com.appexecutors.piceditor.editorengine.utils.ToolType
 
 class PicEditor : AppCompatActivity(){
 
     private lateinit var mBinding: ActivityPicEditorBinding
+    private lateinit var mViewModel: PicViewModel
+    private lateinit var mEditOptions: EditOptions
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_pic_editor)
+
+        mViewModel = ViewModelProvider(this).get(PicViewModel::class.java)
+
+        mEditOptions = intent.getSerializableExtra(EDITOR_OPTIONS) as EditOptions
+
+
+    }
+
+    fun addMoreImages(){
+        mEditOptions.mAddMoreImplementedListener?.addMoreImages(this, mViewModel.mMediaFinalList!!,
+            PIC_IMAGE_EDITOR_CODE
+        )
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        val mImageList = data?.getStringArrayListExtra("image_results") as ArrayList
+        mImageList.map {
+            var mHasOldImage = false
+            mEditOptions.mSelectedImageList.map{ media ->
+                if (media.mOldMediaUri == it) {
+                    mHasOldImage = true
+                }
+            }
+            if (!mHasOldImage) mEditOptions.mSelectedImageList.add(MediaFinal(it))
+        }
+
+        val navHost = supportFragmentManager.findFragmentById(R.id.main_nav_host_fragment)
+        navHost?.let { navFragment ->
+            navFragment.childFragmentManager.primaryNavigationFragment?.let { fragment ->
+                when (fragment::class.java.simpleName) {
+                    PicEditorFragment::class.java.simpleName -> {
+                        val mPicEditor = fragment as PicEditorFragment
+                        mPicEditor.mEditOptions = mEditOptions
+                        mPicEditor.initAll()
+                    }
+                }
+            }
+        }
     }
 
     companion object{
@@ -63,7 +111,11 @@ class PicEditor : AppCompatActivity(){
                             mPicEditor.animateBackIcon(true)
                             mPicEditor.mPickedTool = ToolType.NONE
                         }else if (mPicEditor.mPickedTool == ToolType.NONE){
-                            super.onBackPressed()
+                            Log.e("PicEditor", "onBackPressed: ")
+                            mViewModel.mMediaPreviewList = null
+                            mViewModel.mMediaFinalList = null
+                            setResult(Activity.RESULT_CANCELED)
+                            finish()
                         }
                     }
                     else -> super.onBackPressed()
