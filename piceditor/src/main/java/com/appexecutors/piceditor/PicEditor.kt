@@ -45,15 +45,20 @@ class PicEditor : AppCompatActivity(){
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        val mImageList = data?.getStringArrayListExtra("image_results") as ArrayList
-        mImageList.map {
-            var mHasOldImage = false
-            mEditOptions.mSelectedImageList.map{ media ->
-                if (media.mOldMediaUri == it) {
-                    mHasOldImage = true
+        Log.e("PicEditor", "onActivityResult requestCode: $requestCode")
+        Log.e("PicEditor", "onActivityResult resultCode: $resultCode")
+
+        if (resultCode == Activity.RESULT_OK && requestCode == mEditOptions.mRequestCode) {
+            val mImageList = data?.getStringArrayListExtra("image_results") as ArrayList
+            mImageList.map {
+                var mHasOldImage = false
+                mEditOptions.mSelectedImageList.map { media ->
+                    if (media.mOldMediaUri == it) {
+                        mHasOldImage = true
+                    }
                 }
+                if (!mHasOldImage) mEditOptions.mSelectedImageList.add(MediaFinal(it))
             }
-            if (!mHasOldImage) mEditOptions.mSelectedImageList.add(MediaFinal(it))
         }
 
         val navHost = supportFragmentManager.findFragmentById(R.id.main_nav_host_fragment)

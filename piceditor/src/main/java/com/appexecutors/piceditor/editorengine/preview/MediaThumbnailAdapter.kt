@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.appexecutors.piceditor.R
-import com.appexecutors.piceditor.databinding.RecyclerItemMediaThumbnailBinding
+import com.appexecutors.piceditor.databinding.RecyclerItemThumbnailBinding
 import com.appexecutors.piceditor.editorengine.models.MediaPreview
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -17,7 +17,7 @@ class MediaThumbnailAdapter(val mContext: Context, private val mMediaList: Array
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThumbnailViewHolder {
         val mBinding =
-            RecyclerItemMediaThumbnailBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            RecyclerItemThumbnailBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ThumbnailViewHolder(mBinding)
     }
 
@@ -27,7 +27,7 @@ class MediaThumbnailAdapter(val mContext: Context, private val mMediaList: Array
         holder.bind(mMediaList[holder.adapterPosition], holder.adapterPosition)
     }
 
-    inner class ThumbnailViewHolder(private val mBinding: RecyclerItemMediaThumbnailBinding)
+    inner class ThumbnailViewHolder(private val mBinding: RecyclerItemThumbnailBinding)
         : RecyclerView.ViewHolder(mBinding.root) {
 
         fun bind(mediaPreview: MediaPreview, position: Int) {

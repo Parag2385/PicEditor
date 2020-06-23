@@ -13,6 +13,8 @@ import android.view.View
 import android.view.View.*
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -312,6 +314,20 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
     }
 
     fun editDone(){
+
+        val mMediaPreviewList = mViewModel.mMediaPreviewList
+
+        if (mViewModel.mEditOptions?.isCaptionCompulsory != null && mViewModel.mEditOptions?.isCaptionCompulsory!!) {
+            for (i in 0 until mMediaPreviewList?.size!!) {
+                if (mMediaPreviewList[i].mCaption.isEmpty()){
+                    Toast.makeText(requireActivity(), "Please Enter Caption", LENGTH_SHORT).show()
+                    mBinding.viewPager.currentItem = i
+                    mBinding.editTextCaption.requestFocus()
+                    mInputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+                    return
+                }
+            }
+        }
 
         mViewModel.mMediaFinalList = ArrayList()
 
