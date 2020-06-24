@@ -45,9 +45,6 @@ class PicEditor : AppCompatActivity(){
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        Log.e("PicEditor", "onActivityResult requestCode: $requestCode")
-        Log.e("PicEditor", "onActivityResult resultCode: $resultCode")
-
         if (resultCode == Activity.RESULT_OK && requestCode == mEditOptions.mRequestCode) {
             val mImageList = data?.getStringArrayListExtra("image_results") as ArrayList
             mImageList.map {

@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.appexecutors.piceditor.editorengine.models.MediaPreview
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.MEDIA_POSITION
+import com.appexecutors.piceditor.editorengine.utils.Utils
 
 class MediaPreviewPagerAdapter(
     fm: FragmentActivity,
@@ -19,11 +20,20 @@ class MediaPreviewPagerAdapter(
     override fun createFragment(position: Int): Fragment {
         val mBundle = Bundle()
         mBundle.putInt(MEDIA_POSITION, position)
-        val imageFragment =
-            ImagePreviewFragment()
-        imageFragment.arguments = mBundle
-        mFragmentList.add(imageFragment)
-        return imageFragment
+
+        if (Utils.getMimeType(mMediaList[position].mMediaUri) != null && Utils.getMimeType(mMediaList[position].mMediaUri)?.contains("image")!!){
+            val imageFragment = ImagePreviewFragment()
+            imageFragment.arguments = mBundle
+            mFragmentList.add(imageFragment)
+            return imageFragment
+        }else if (Utils.getMimeType(mMediaList[position].mMediaUri) != null && Utils.getMimeType(mMediaList[position].mMediaUri)?.contains("video")!!){
+            val videoFragment = VideoPreviewFragment()
+            videoFragment.arguments = mBundle
+            mFragmentList.add(videoFragment)
+            return videoFragment
+        }
+
+        return ImagePreviewFragment()
     }
 
     private val pageIds= mMediaList.map { it.hashCode().toLong() }

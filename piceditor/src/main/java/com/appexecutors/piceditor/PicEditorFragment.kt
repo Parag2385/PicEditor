@@ -36,12 +36,15 @@ import com.appexecutors.piceditor.editorengine.utils.AppConstants.DISABLE_BRUSH_
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDITED_MEDIA_LIST
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDIT_TEXT_ACTION_DONE
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDIT_TEXT_ACTION_START
+import com.appexecutors.piceditor.editorengine.utils.AppConstants.IMAGE
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.INTENT_FROM_PIC_EDITOR
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.INTENT_FROM_PIC_EDITOR_FRAGMENT
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.SAVE_BITMAP_FOR_CROP_ACTION_DONE
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.UNDO_REDO_ACTION
+import com.appexecutors.piceditor.editorengine.utils.AppConstants.VIDEO
 import com.appexecutors.piceditor.editorengine.utils.keyboard.KeyboardHeightObserver
 import com.appexecutors.piceditor.editorengine.utils.keyboard.KeyboardHeightProvider
+import com.github.veritas1.verticalslidecolorpicker.VerticalSlideColorPicker
 import kotlinx.coroutines.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -132,8 +135,11 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
                 super.onPageSelected(position)
                 mViewModel.mCurrentMediaPosition = position
                 if (mViewModel.mMediaPreviewList?.size!! > 0) {
+
                     mBinding.editTextCaption.setText(mViewModel.mMediaPreviewList!![position].mCaption)
                     mThumbnailAdapter?.itemClick(position, 2)
+
+                    mBinding.mode = (if (mMediaPreviewAdapter?.getCurrentFragment(position) is ImagePreviewFragment) IMAGE else VIDEO)
                 }
             }
         })
@@ -148,18 +154,7 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {/*Not Required*/}
         })
 
-        mBinding.colorPicker.resetToDefault()
-
-        mBinding.colorPicker.setOnColorChangeListener {
-            if (it != 0) mPicketColor = it
-
-            if (mPickedTool == ToolType.TEXT || mPickedTool == ToolType.TEXT_EDIT){
-                mBinding.editText.setTextColor(mPicketColor)
-                mBinding.imageViewText.background = Utils.tintDrawable(requireContext(), R.drawable.shape_circle, mPicketColor)
-            }else if(mPickedTool == ToolType.BRUSH) {
-                startBrush()
-            }
-        }
+        colorPicker()
 
         captionClickListener()
     }
@@ -197,7 +192,11 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
     var mPickedTool = ToolType.NONE
 
     fun addTextOver(){
-        setTool(ToolType.TEXT)
+        if (mPickedTool == ToolType.TEXT){
+            clearText(INTENT_FROM_PIC_EDITOR_FRAGMENT)
+            animateBackIcon(true)
+            mPickedTool = ToolType.NONE
+        }else setTool(ToolType.TEXT)
     }
 
     fun textDone(){
@@ -225,10 +224,17 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
     }
 
     fun startBrush(){
-        setTool(ToolType.BRUSH)
-        val event = GlobalEventListener(ADD_BRUSH_ACTION)
-        event.mTextColor = mPicketColor
-        EventBus.getDefault().post(event)
+        if (mPickedTool == ToolType.BRUSH){
+            brushDone()
+            animateBackIcon(true)
+            mPickedTool = ToolType.NONE
+        }else{
+            setTool(ToolType.BRUSH)
+            val event = GlobalEventListener(ADD_BRUSH_ACTION)
+            event.mTextColor = mPicketColor
+            EventBus.getDefault().post(event)
+        }
+
     }
 
     fun brushDone(){
@@ -313,11 +319,31 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
         }
     }
 
+    private fun colorPicker(){
+        mBinding.colorPicker.resetToDefault()
+        mBinding.colorPicker.setOnColorChangeListener(mOnColorChangeListener)
+    }
+
+    private var mOnColorChangeListener =
+        VerticalSlideColorPicker.OnColorChangeListener {
+            if (it != 0) mPicketColor = it
+
+            if (mPickedTool == ToolType.TEXT || mPickedTool == ToolType.TEXT_EDIT){
+                mBinding.editText.setTextColor(mPicketColor)
+                mBinding.imageViewText.background = Utils.tintDrawable(requireContext(), R.drawable.shape_circle, mPicketColor)
+            }else if(mPickedTool == ToolType.BRUSH) {
+                val event = GlobalEventListener(ADD_BRUSH_ACTION)
+                event.mTextColor = mPicketColor
+                EventBus.getDefault().post(event)
+            }
+        }
+
     fun editDone(){
 
         val mMediaPreviewList = mViewModel.mMediaPreviewList
 
-        if (mViewModel.mEditOptions?.isCaptionCompulsory != null && mViewModel.mEditOptions?.isCaptionCompulsory!!) {
+        if (mViewModel.mEditOptions?.showCaption != null && mViewModel.mEditOptions?.showCaption!! &&
+            mViewModel.mEditOptions?.isCaptionCompulsory != null && mViewModel.mEditOptions?.isCaptionCompulsory!!) {
             for (i in 0 until mMediaPreviewList?.size!!) {
                 if (mMediaPreviewList[i].mCaption.isEmpty()){
                     Toast.makeText(requireActivity(), "Please Enter Caption", LENGTH_SHORT).show()
@@ -348,12 +374,18 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
         coroutineScope{
             mViewModel.mMediaPreviewList?.mapIndexed { i, media ->
                 async(Dispatchers.IO){
-                    val mImageFragment = mMediaPreviewAdapter?.getCurrentFragment(i) as ImagePreviewFragment
-                    val path = mImageFragment.saveBitmap()
+                    val path = if (mMediaPreviewAdapter?.getCurrentFragment(i) is ImagePreviewFragment) {
+                        val mImageFragment =
+                            mMediaPreviewAdapter?.getCurrentFragment(i) as ImagePreviewFragment
+                        mImageFragment.saveBitmap()
+                    }else {
+                        media.mMediaUri
+                    }
 
                     val mediaFinal = MediaFinal(path)
                     mediaFinal.mCaption = media.mCaption
                     mediaFinal.mOldMediaUri = media.mOldMediaUri
+                    mediaFinal.mMimeType = Utils.getMimeType(mediaFinal.mMediaUri)
                     mViewModel.mMediaFinalList?.add(mediaFinal)
                 }
             }?.awaitAll()

@@ -18,6 +18,7 @@ class EditOptions: Serializable {
     var showCaption: Boolean = false
     var isCaptionCompulsory: Boolean = false
     var showThumbnail: Boolean = true
+    var allowAddingImages: Boolean = true
     var mWatermarkType: WatermarkType = WatermarkType.NONE
 
     //if WatermarkType.TEXT
