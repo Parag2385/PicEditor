@@ -33,7 +33,10 @@ class MediaPreviewPagerAdapter(
             return videoFragment
         }
 
-        return ImagePreviewFragment()
+        val imageFragment = ImagePreviewFragment()
+        imageFragment.arguments = mBundle
+        mFragmentList.add(imageFragment)
+        return imageFragment
     }
 
     private val pageIds= mMediaList.map { it.hashCode().toLong() }
@@ -46,7 +49,8 @@ class MediaPreviewPagerAdapter(
         return pageIds.contains(itemId)
     }
 
-    fun getCurrentFragment(position: Int): Fragment{
+    fun getCurrentFragment(position: Int): Fragment?{
+        if (mFragmentList.size == 0) return null
         return mFragmentList[position]
     }
 }
