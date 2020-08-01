@@ -42,6 +42,7 @@ import com.appexecutors.piceditor.editorengine.utils.AppConstants.INTENT_FROM_PI
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.SAVE_BITMAP_FOR_CROP_ACTION_DONE
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.UNDO_REDO_ACTION
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.VIDEO
+import com.appexecutors.piceditor.editorengine.utils.Utils.disableEnableControls
 import com.appexecutors.piceditor.editorengine.utils.keyboard.KeyboardHeightObserver
 import com.appexecutors.piceditor.editorengine.utils.keyboard.KeyboardHeightProvider
 import com.github.veritas1.verticalslidecolorpicker.VerticalSlideColorPicker
@@ -93,7 +94,6 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
     }
 
     fun initAll(){
-
         mBinding.fragment = this
         mBinding.options = mEditOptions
         mViewModel.mEditOptions = mEditOptions
@@ -355,6 +355,10 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
             }
         }
 
+        mInputMethodManager.hideSoftInputFromWindow(mBinding.root.windowToken, 0)
+        disableEnableControls(false, mBinding.rootView)
+        mBinding.constraintProgress.visibility = VISIBLE
+
         mViewModel.mMediaFinalList = ArrayList()
 
         CoroutineScope(Dispatchers.Main).launch {
@@ -430,6 +434,7 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
             params.setMargins(0, 0, 0, finalHeight)
             mBinding.constraintLayoutCaption.layoutParams = params
         }else{
+            mPickedTool = ToolType.NONE
             val params = mBinding.constraintLayoutCaption.layoutParams as ViewGroup.MarginLayoutParams
             params.setMargins(0, 0, 0, 0)
             mBinding.constraintLayoutCaption.layoutParams = params

@@ -8,7 +8,6 @@ import java.io.Serializable
 class EditOptions: Serializable {
 
     var mSelectedImageList = ArrayList<MediaFinal>()
-    var mRequestCode = 0
     var mAddMoreImplementedListener: AddMoreImagesListener? = null
 
     var showDeleteOption: Boolean = true

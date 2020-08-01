@@ -59,7 +59,7 @@ class VideoPreviewFragment : Fragment() {
 
     }
 
-    var player: SimpleExoPlayer? = null
+    private var player: SimpleExoPlayer? = null
 
     private fun initializePlayer(mImageUri: String?) {
         if (player == null) { // 1. Create a default TrackSelector
@@ -134,7 +134,7 @@ class VideoPreviewFragment : Fragment() {
         // Produces DataSource instances through which media data is loaded.
         val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(
             mBinding.root.context,
-            Util.getUserAgent(mBinding.root.context, "Scogo"), bandwidthMeter
+            Util.getUserAgent(mBinding.root.context, getString(R.string.app_name)), bandwidthMeter
         )
         // This is the MediaSource representing the media to be played.
         val videoSource: MediaSource = ExtractorMediaSource.Factory(dataSourceFactory)

@@ -25,8 +25,6 @@ object AppConstants {
 
     const val EDITED_MEDIA_LIST = "EDITED_MEDIA_LIST"
 
-    const val PIC_IMAGE_EDITOR_CODE = 101
-
     const val IMAGE = 1
     const val VIDEO = 2
 

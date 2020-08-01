@@ -12,11 +12,11 @@ import com.appexecutors.piceditor.editorengine.AddMoreImagesListener
 import com.appexecutors.piceditor.editorengine.models.MediaFinal
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDITED_MEDIA_LIST
 import com.appexecutors.piceditor.editorengine.utils.WatermarkType
-import com.appexecutors.piceditorsample.AppConstants.PIC_IMAGE_EDITOR_CODE
-import com.appexecutors.piceditorsample.AppConstants.PIX_IMAGE_PICKER_CODE
 import com.appexecutors.piceditorsample.databinding.ActivityMainBinding
-import com.fxn.pix.Options
-import com.fxn.pix.Pix
+import com.appexecutors.picker.Picker
+import com.appexecutors.picker.Picker.Companion.PICKED_MEDIA_LIST
+import com.appexecutors.picker.Picker.Companion.REQUEST_CODE_PICKER
+import com.appexecutors.picker.utils.PickerOptions
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,12 +28,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
+        val pickerOptions = PickerOptions.init().apply {
+            maxCount = 10
+            maxVideoDuration = 60
+        }
+
         mBinding.fab.setOnClickListener {
-            Pix.start(this, Options.init().setRequestCode(PIX_IMAGE_PICKER_CODE).setCount(10))
+            Picker.startPicker(this, pickerOptions)
         }
 
         mEditOptions = EditOptions.init().apply {
-            mRequestCode = PIC_IMAGE_EDITOR_CODE
             mAddMoreImplementedListener = mAddMoreListener
             showCaption = true
             isCaptionCompulsory = true
@@ -44,8 +48,8 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (resultCode == Activity.RESULT_OK && requestCode == PIX_IMAGE_PICKER_CODE){
-            val mImageList = data?.getStringArrayListExtra(Pix.IMAGE_RESULTS) as ArrayList
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_PICKER){
+            val mImageList = data?.getStringArrayListExtra(PICKED_MEDIA_LIST) as ArrayList
             mImageList.map {
                 mEditOptions.mSelectedImageList.add(MediaFinal(it))
             }
@@ -55,9 +59,9 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        if (resultCode == Activity.RESULT_CANCELED && requestCode == mEditOptions.mRequestCode) mEditOptions.mSelectedImageList = ArrayList()
+        if (resultCode == Activity.RESULT_CANCELED && requestCode == PicEditor.REQUEST_CODE_EDITOR) mEditOptions.mSelectedImageList = ArrayList()
 
-        if (resultCode == Activity.RESULT_OK && requestCode == mEditOptions.mRequestCode){
+        if (resultCode == Activity.RESULT_OK && requestCode == PicEditor.REQUEST_CODE_EDITOR){
             @Suppress("UNCHECKED_CAST")
             val mEditedList = data?.getSerializableExtra(EDITED_MEDIA_LIST) as ArrayList<MediaFinal>?
 
@@ -75,16 +79,16 @@ class MainActivity : AppCompatActivity() {
 
         override fun addMoreImages(
             context: AppCompatActivity,
-            selectedImageList: ArrayList<MediaFinal>,
-            requestCodePix: Int
+            selectedImageList: ArrayList<MediaFinal>
         ) {
             val mImagePathList = ArrayList<String>()
             selectedImageList.map { mImagePathList.add(it.mOldMediaUri) }
-            Pix.start(context, Options.init().apply {
-                requestCode = requestCodePix
-                count = 5
-                preSelectedUrls = mImagePathList
-            })
+            val pickerOptions = PickerOptions.init().apply {
+                maxCount = 10
+                maxVideoDuration = 60
+                preSelectedMediaList = mImagePathList
+            }
+            Picker.startPicker(context, pickerOptions)
         }
     }
 }
