@@ -3,6 +3,7 @@ package com.appexecutors.piceditor.editorengine.utils
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Environment
 import android.view.View
 import android.view.ViewGroup
@@ -29,9 +30,12 @@ object Utils {
         return drawable
     }
 
-    suspend fun saveImage(finalBitmap: Bitmap, context: Context): String? = suspendCoroutine  {
+    suspend fun saveImage(finalBitmap: Bitmap, context: Context): String? = suspendCoroutine {
         val myDir =
-            File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString() + File.separator + "Edited")
+            File(
+                context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                    .toString() + File.separator + "Edited"
+            )
 
         if (!myDir.exists()) myDir.mkdirs()
 
@@ -80,13 +84,13 @@ object Utils {
         paint.textSize = size
         paint.isAntiAlias = true
 
-       /* val stkPaint = Paint()
-        stkPaint.style = Paint.Style.STROKE
-        stkPaint.strokeWidth = 1f
-        stkPaint.textSize = size
-        stkPaint.alpha = alpha
-        stkPaint.color = Color.BLACK
-        stkPaint.isAntiAlias = true*/
+        /* val stkPaint = Paint()
+         stkPaint.style = Paint.Style.STROKE
+         stkPaint.strokeWidth = 1f
+         stkPaint.textSize = size
+         stkPaint.alpha = alpha
+         stkPaint.color = Color.BLACK
+         stkPaint.isAntiAlias = true*/
         //set should be underlined or not
 
         //draw text on given location
@@ -94,7 +98,7 @@ object Utils {
         var width: Float = paint.measureText(watermark)
         if (width > w) {
             var i = 2
-            while (width > w/3) {
+            while (width > w / 3) {
                 paint.textSize = size - i
                 /*stkPaint.textSize = size - i*/
                 width = paint.measureText(watermark)
@@ -102,7 +106,7 @@ object Utils {
             }
         } else {
             var i = 2
-            while (width < w/3) {
+            while (width < w / 3) {
                 paint.textSize = size + i
                 /*stkPaint.textSize = size + i*/
                 width = paint.measureText(watermark)
@@ -121,7 +125,13 @@ object Utils {
         paint.getFontMetrics(fm)
 
 
-        canvas.drawRect(xPos - margin, yPos + fm.top - margin, xPos + width + margin, yPos + fm.bottom+ margin, paint)
+        canvas.drawRect(
+            xPos - margin,
+            yPos + fm.top - margin,
+            xPos + width + margin,
+            yPos + fm.bottom + margin,
+            paint
+        )
 
         paint.color = color
         val tf = Typeface.create("Helvetica", Typeface.BOLD)
@@ -135,11 +145,14 @@ object Utils {
     }
 
 
-    fun getMimeType(url: String?): String? {
+    fun getMimeType(url: String?, context: Context): String? {
         var type: String? = null
         val extension = MimeTypeMap.getFileExtensionFromUrl(url)
-        if (extension != null) {
+        if (extension != null && extension.isNotEmpty()) {
             type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+        } else {
+            val uri = Uri.parse(url)
+            if (uri != null) type = context.contentResolver.getType(uri)
         }
         return type
     }

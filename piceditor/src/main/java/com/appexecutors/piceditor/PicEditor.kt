@@ -26,7 +26,7 @@ class PicEditor : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_pic_editor)
-
+        supportActionBar?.hide()
         mViewModel = ViewModelProvider(this).get(PicViewModel::class.java)
 
         mEditOptions = intent.getSerializableExtra(EDITOR_OPTIONS) as EditOptions

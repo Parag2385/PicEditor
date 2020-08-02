@@ -389,7 +389,7 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
                     val mediaFinal = MediaFinal(path)
                     mediaFinal.mCaption = media.mCaption
                     mediaFinal.mOldMediaUri = media.mOldMediaUri
-                    mediaFinal.mMimeType = Utils.getMimeType(mediaFinal.mMediaUri)
+                    mediaFinal.mMimeType = Utils.getMimeType(mediaFinal.mMediaUri, requireActivity())
                     mViewModel.mMediaFinalList?.add(mediaFinal)
                 }
             }?.awaitAll()

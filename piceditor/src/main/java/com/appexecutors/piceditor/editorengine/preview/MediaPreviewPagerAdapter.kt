@@ -9,7 +9,7 @@ import com.appexecutors.piceditor.editorengine.utils.AppConstants.MEDIA_POSITION
 import com.appexecutors.piceditor.editorengine.utils.Utils
 
 class MediaPreviewPagerAdapter(
-    fm: FragmentActivity,
+    private val fm: FragmentActivity,
     private val mMediaList: ArrayList<MediaPreview>
 ) : FragmentStateAdapter(fm) {
 
@@ -21,12 +21,12 @@ class MediaPreviewPagerAdapter(
         val mBundle = Bundle()
         mBundle.putInt(MEDIA_POSITION, position)
 
-        if (Utils.getMimeType(mMediaList[position].mMediaUri) != null && Utils.getMimeType(mMediaList[position].mMediaUri)?.contains("image")!!){
+        if (Utils.getMimeType(mMediaList[position].mMediaUri, fm) != null && Utils.getMimeType(mMediaList[position].mMediaUri, fm)?.contains("image")!!){
             val imageFragment = ImagePreviewFragment()
             imageFragment.arguments = mBundle
             mFragmentList.add(imageFragment)
             return imageFragment
-        }else if (Utils.getMimeType(mMediaList[position].mMediaUri) != null && Utils.getMimeType(mMediaList[position].mMediaUri)?.contains("video")!!){
+        }else if (Utils.getMimeType(mMediaList[position].mMediaUri, fm) != null && Utils.getMimeType(mMediaList[position].mMediaUri, fm)?.contains("video")!!){
             val videoFragment = VideoPreviewFragment()
             videoFragment.arguments = mBundle
             mFragmentList.add(videoFragment)
