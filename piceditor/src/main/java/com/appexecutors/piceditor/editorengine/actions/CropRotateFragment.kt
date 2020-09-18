@@ -96,7 +96,12 @@ class CropRotateFragment : Fragment(), CropAspectRatioAdapter.AspectRationInterf
 
     fun doneCropping(){
         CoroutineScope(Dispatchers.Main).launch{
-            val mCroppedBitmap = withContext(Dispatchers.IO){
+            val mCroppedBitmap = try {
+                withContext(Dispatchers.IO){
+                    mBinding.cropImageView.croppedImage
+                }
+            }catch (e: Exception){
+                e.printStackTrace()
                 mBinding.cropImageView.croppedImage
             }
             if (mViewModel.mMediaPreviewList != null){

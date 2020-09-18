@@ -50,7 +50,7 @@ class MediaPreviewPagerAdapter(
     }
 
     fun getCurrentFragment(position: Int): Fragment?{
-        if (mFragmentList.size == 0) return null
+        if (position > mFragmentList.size - 1) return null
         return mFragmentList[position]
     }
 }

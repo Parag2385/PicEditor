@@ -1,5 +1,5 @@
 # PicEditor (WhatsApp Style Image Editor)
-PicEditor is a Whatsapp image Editor replica. with this, you can integrate an image editor just like WhatsApp.
+PicEditor is a WhatsApp image Editor replica. with this, you can integrate an image editor just like WhatsApp.
 
 ## Usage:
 

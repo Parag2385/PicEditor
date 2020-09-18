@@ -142,86 +142,6 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraint_layout_caption"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@+id/recycler_view_media">
-
-
-            <ImageView
-                android:id="@+id/image_view_add_more"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:background="@drawable/background_black_alpha"
-                android:contentDescription="@string/content_description_editor_delete"
-                android:onClick="@{() -> fragment.addMore()}"
-                android:paddingStart="8dp"
-                android:paddingTop="4dp"
-                android:paddingEnd="8dp"
-                android:src="@drawable/ic_photo_black"
-                android:tint="@color/colorWhite"
-                android:visibility="@{options.allowAddingImages ? View.VISIBLE: View.GONE}"
-                app:layout_constraintBottom_toBottomOf="@+id/edit_text_caption"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/edit_text_caption" />
-
-            <EditText
-                android:id="@+id/edit_text_caption"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:autofillHints="null"
-                android:background="@drawable/background_black_alpha"
-                android:gravity="center_vertical"
-                android:hint="@string/str_add_caption"
-                android:inputType="textCapSentences|textMultiLine"
-                android:maxLines="3"
-                android:minHeight="40dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="68dp"
-                android:textColor="@color/colorWhite"
-                android:textColorHint="@color/colorWhite"
-                android:visibility="@{options.showCaption? View.VISIBLE: View.GONE}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/image_view_add_more" />
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="0dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:background="@color/colorWhite"
-                android:visibility="@{options.allowAddingImages ? View.VISIBLE: View.GONE}"
-                app:layout_constraintBottom_toBottomOf="@+id/edit_text_caption"
-                app:layout_constraintStart_toStartOf="@+id/edit_text_caption"
-                app:layout_constraintTop_toTopOf="@+id/edit_text_caption" />
-
-            <View
-                android:id="@+id/view_anchor"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                app:layout_constraintBottom_toTopOf="@+id/edit_text_caption" />
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fab_select"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="16dp"
-                android:backgroundTint="@color/colorPrimary"
-                android:elevation="4dp"
-                android:onClick="@{()-> fragment.editDone()}"
-                android:src="@drawable/ic_check_black"
-                app:borderWidth="0dp"
-                app:fabCustomSize="48dp"
-                app:layout_constraintBottom_toBottomOf="@+id/view_anchor"
-                app:layout_constraintEnd_toEndOf="@+id/view_anchor"
-                app:layout_constraintTop_toTopOf="@+id/view_anchor"
-                app:maxImageSize="20dp"
-                app:tint="@color/colorWhite" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_media"
             android:layout_width="match_parent"
@@ -271,6 +191,87 @@
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_layout_caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/recycler_view_media">
+
+
+            <ImageView
+                android:id="@+id/image_view_add_more"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:background="@drawable/background_black_alpha"
+                android:contentDescription="@string/content_description_editor_delete"
+                android:onClick="@{() -> fragment.addMore()}"
+                android:paddingStart="8dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="8dp"
+                android:src="@drawable/ic_photo_black"
+                app:tint="@color/colorWhite"
+                android:visibility="@{options.allowAddingImages ? View.VISIBLE: View.GONE}"
+                app:layout_constraintBottom_toBottomOf="@+id/edit_text_caption"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/edit_text_caption" />
+
+            <EditText
+                android:id="@+id/edit_text_caption"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:autofillHints="null"
+                android:background="@drawable/background_black_alpha"
+                android:gravity="center_vertical"
+                android:hint="@string/str_add_caption"
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLines="3"
+                android:minHeight="40dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="68dp"
+                android:textColor="@color/colorWhite"
+                android:textColorHint="@color/colorWhite"
+                android:visibility="@{options.showCaption? View.VISIBLE: View.GONE}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/image_view_add_more" />
+
+            <View
+                android:id="@+id/vertical_line"
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/colorWhite"
+                android:visibility="@{options.allowAddingImages ? View.VISIBLE: View.GONE}"
+                app:layout_constraintBottom_toBottomOf="@+id/edit_text_caption"
+                app:layout_constraintStart_toStartOf="@+id/edit_text_caption"
+                app:layout_constraintTop_toTopOf="@+id/edit_text_caption" />
+
+            <View
+                android:id="@+id/view_anchor"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                app:layout_constraintBottom_toTopOf="@+id/edit_text_caption" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_select"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="16dp"
+                android:backgroundTint="@color/colorPrimary"
+                android:elevation="8dp"
+                android:onClick="@{()-> fragment.editDone()}"
+                android:src="@drawable/ic_check_black"
+                app:borderWidth="0dp"
+                app:fabCustomSize="48dp"
+                app:layout_constraintBottom_toBottomOf="@+id/view_anchor"
+                app:layout_constraintEnd_toEndOf="@+id/view_anchor"
+                app:layout_constraintTop_toTopOf="@+id/view_anchor"
+                app:maxImageSize="20dp"
+                app:tint="@color/colorWhite" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

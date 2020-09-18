@@ -40,3 +40,6 @@ app/release/
 
 #NDK
 obj/
+
+bintray.gradle
+install.gradle

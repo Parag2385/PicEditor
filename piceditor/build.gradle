@@ -43,15 +43,15 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.3.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.core:core-ktx:1.3.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
 
     //view pager 2
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
 
     //material design
-    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'com.google.android.material:material:1.2.1'
 
     implementation "com.github.chrisbanes:PhotoView:2.3.0"
 
@@ -73,7 +73,7 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.1.1'
 
     //Navigation
-    def nav_version = "2.2.2"
+    def nav_version = "2.3.0"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
@@ -87,7 +87,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_scope_version"
 
     // Kotlin Co-routines
-    def co_routines_version = "1.3.0"
+    def co_routines_version = "1.3.9"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$co_routines_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$co_routines_version"
 
@@ -97,16 +97,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
 
-task makeJar(type: Copy) {
-    from('build/intermediates/bundles/release/')
-    into('build/outputs/')
-    include('classes.jar')
-    rename('classes.jar', 'piceditor.jar')
-    into('release/') //you can change this directory where you want to copy your .jar
-}
-
-task clearJar(type: Delete) {
-    delete 'build/libs/piceditor.jar'
-}
+apply from: 'install.gradle'
+apply from: 'bintray.gradle'
 
 apply plugin: "androidx.navigation.safeargs.kotlin"

@@ -40,7 +40,10 @@ class MainActivity : AppCompatActivity() {
         mEditOptions = EditOptions.init().apply {
             mAddMoreImplementedListener = mAddMoreListener
             showCaption = true
-            isCaptionCompulsory = true
+            showDrawOption = false
+            showTextOption = false
+            showThumbnail = false
+            isCaptionCompulsory = false
             mWatermarkType = WatermarkType.DATE
         }
     }

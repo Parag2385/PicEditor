@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -99,6 +100,19 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
         mViewModel.mEditOptions = mEditOptions
 
         loadImages()
+
+        if (!mEditOptions.showCaption){
+            val set = ConstraintSet()
+            set.clone(mBinding.constraintLayoutCaption)
+            set.clear(R.id.fab_select, ConstraintSet.TOP)
+            set.connect(R.id.fab_select, ConstraintSet.BOTTOM, R.id.constraint_layout_caption, ConstraintSet.BOTTOM, 24)
+            set.applyTo(mBinding.constraintLayoutCaption)
+        }
+
+        if (!mEditOptions.showDrawOption && !mEditOptions.showTextOption){
+            mBinding.imageViewUndo.visibility = GONE
+            mBinding.imageViewRedo.visibility = GONE
+        }
     }
 
     private var mMediaPreviewAdapter : MediaPreviewPagerAdapter? = null
@@ -122,7 +136,7 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
 
         mMediaPreviewAdapter = MediaPreviewPagerAdapter(requireActivity(), mViewModel.mMediaPreviewList!!)
         mBinding.viewPager.adapter = mMediaPreviewAdapter
-        mBinding.viewPager.offscreenPageLimit = mViewModel.mMediaPreviewList?.size!!
+        if(mViewModel.mMediaPreviewList?.size!! > 0) mBinding.viewPager.offscreenPageLimit = mViewModel.mMediaPreviewList?.size!!
 
         mThumbnailAdapter = MediaThumbnailAdapter(requireActivity(), mViewModel.mMediaPreviewList!!, this)
         mBinding.recyclerViewMedia.adapter = mThumbnailAdapter
