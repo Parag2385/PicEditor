@@ -117,11 +117,14 @@ class ImagePreviewFragment : Fragment(), OnPhotoEditorListener {
         CoroutineScope(Dispatchers.Main).launch {
             withContext(Dispatchers.IO){
                 mPhotoEditor?.saveAsBitmap(object : OnSaveBitmap {
-                    override fun onFailure(e: Exception?) {/*Not Required*/}
+                    override fun onFailure(e: Exception?) {/*Not Required*/
+                    }
 
                     override fun onBitmapReady(saveBitmap: Bitmap?) {
-                        mViewModel.mMediaPreviewList!![mCurrentPosition].mProcessedBitmap = saveBitmap
-                        EventBus.getDefault().post(GlobalEventListener(SAVE_BITMAP_FOR_CROP_ACTION_DONE))
+                        mViewModel.mMediaPreviewList?.let {
+                            it[mCurrentPosition].mProcessedBitmap = saveBitmap
+                            EventBus.getDefault().post(GlobalEventListener(SAVE_BITMAP_FOR_CROP_ACTION_DONE))
+                        }
                     }
                 })
             }

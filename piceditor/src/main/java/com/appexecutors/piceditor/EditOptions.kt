@@ -12,6 +12,7 @@ class EditOptions: Serializable {
 
     var showDeleteOption: Boolean = true
     var showCropOption: Boolean = true
+    var openWithCropOption: Boolean = false
     var showTextOption: Boolean = true
     var showDrawOption: Boolean = true
     var showCaption: Boolean = false

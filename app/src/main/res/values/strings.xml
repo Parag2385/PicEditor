@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">PicEditor</string>
+    <string name="crop_picture_properly">Make sure to CROP PICTURES appropriately otherwise the ticket sign-off will be rejected</string>
+    <string name="crop_picture_properly_hindi">सुनिश्चित करें कि PICTURES अच्छे से CROP करके अपलोड किए गए हैं अन्यथा टिकट साइन ऑफ को अस्वीकार कर दिया जाएगा</string>
+    <string name="done">Done</string>
 </resources>

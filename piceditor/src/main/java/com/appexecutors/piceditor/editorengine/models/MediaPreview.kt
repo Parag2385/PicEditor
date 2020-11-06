@@ -12,4 +12,6 @@ data class MediaPreview(
     var mProcessedBitmap: Bitmap? = null
 
     var mOldMediaUri: String = ""
+
+    var mImageCropped: Boolean = false
 }

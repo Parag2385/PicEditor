@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
+import android.os.Handler
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -16,6 +17,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -115,6 +117,23 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
         }
     }
 
+    private fun checkIfImagesAreCropped(){
+
+        val delay = if(mViewModel.mCurrentMediaPosition == 0) 500L else 10L
+
+        if (mEditOptions.openWithCropOption){
+            Handler().postDelayed({
+                if (!mViewModel.mMediaPreviewList!![mViewModel.mCurrentMediaPosition].mImageCropped){
+                    if (mMediaPreviewAdapter?.getCurrentFragment(mViewModel.mCurrentMediaPosition) is ImagePreviewFragment) {
+                        val mImageFragment =
+                            mMediaPreviewAdapter?.getCurrentFragment(mViewModel.mCurrentMediaPosition) as ImagePreviewFragment?
+                        mImageFragment?.saveSingleBitmap()
+                    }
+                }
+            }, delay)
+        }
+    }
+
     private var mMediaPreviewAdapter : MediaPreviewPagerAdapter? = null
     private var mThumbnailAdapter : MediaThumbnailAdapter? = null
 
@@ -154,6 +173,8 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
                     mThumbnailAdapter?.itemClick(position, 2)
 
                     mBinding.mode = (if (mMediaPreviewAdapter?.getCurrentFragment(position) is ImagePreviewFragment) IMAGE else VIDEO)
+
+                    checkIfImagesAreCropped()
                 }
             }
         })
@@ -281,7 +302,7 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
                 mBinding.editText.setText(mClickedText)
                 mBinding.editText.setTextColor(mClickedColor)
             }
-            mBinding.imageViewText.background = resources.getDrawable(R.drawable.shape_circle, null)
+            mBinding.imageViewText.background = ContextCompat.getDrawable(requireActivity(), R.drawable.shape_circle)
             animateBackIcon(false)
             clearBrush()
         }
@@ -308,14 +329,14 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
 
     fun animateBackIcon(showBack: Boolean){
         if(showBack){
-            mBinding.imageViewBack.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_clear_to_back))
+            mBinding.imageViewBack.setImageDrawable(ContextCompat.getDrawable(requireActivity(), R.drawable.ic_clear_to_back))
             mBinding.imageViewBack.post {
                 val frameAnimation =
                     mBinding.imageViewBack.drawable as AnimatedVectorDrawable
                 frameAnimation.start()
             }
         }else{
-            mBinding.imageViewBack.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_back_to_clear))
+            mBinding.imageViewBack.setImageDrawable(ContextCompat.getDrawable(requireActivity(), R.drawable.ic_back_to_clear))
             mBinding.imageViewBack.post {
                 val frameAnimation =
                     mBinding.imageViewBack.drawable as AnimatedVectorDrawable
@@ -376,11 +397,16 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
         mViewModel.mMediaFinalList = ArrayList()
 
         CoroutineScope(Dispatchers.Main).launch {
-            getAllImages(true)
-            val intent = Intent()
-            intent.putExtra(EDITED_MEDIA_LIST, mViewModel.mMediaFinalList)
-            requireActivity().setResult(RESULT_OK, intent)
-            requireActivity().finish()
+            withContext(Dispatchers.IO) {
+                getAllImages(true)
+            }
+
+            Handler().postDelayed({
+                val intent = Intent()
+                intent.putExtra(EDITED_MEDIA_LIST, mViewModel.mMediaFinalList)
+                requireActivity().setResult(RESULT_OK, intent)
+                requireActivity().finish()
+            }, 1000)
         }
 
     }
@@ -389,7 +415,7 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
         mViewModel.mMediaFinalList = ArrayList()
         val currentWatermarkType = mViewModel.mEditOptions?.mWatermarkType!!
         if (!mEditDone) mViewModel.mEditOptions?.mWatermarkType = WatermarkType.NONE
-        coroutineScope{
+        withContext(Dispatchers.IO){
             mViewModel.mMediaPreviewList?.mapIndexed { i, media ->
                 async(Dispatchers.IO){
                     val path = if (mMediaPreviewAdapter?.getCurrentFragment(i) is ImagePreviewFragment) {
@@ -404,6 +430,7 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
                     mediaFinal.mCaption = media.mCaption
                     mediaFinal.mOldMediaUri = media.mOldMediaUri
                     mediaFinal.mMimeType = Utils.getMimeType(mediaFinal.mMediaUri, requireActivity())
+                    println(mediaFinal.mMediaUri)
                     mViewModel.mMediaFinalList?.add(mediaFinal)
                 }
             }?.awaitAll()

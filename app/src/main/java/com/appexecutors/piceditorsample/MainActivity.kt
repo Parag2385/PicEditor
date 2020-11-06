@@ -1,9 +1,12 @@
 package com.appexecutors.piceditorsample
 
 import android.app.Activity
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.appexecutors.piceditor.EditOptions
@@ -13,6 +16,7 @@ import com.appexecutors.piceditor.editorengine.models.MediaFinal
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.EDITED_MEDIA_LIST
 import com.appexecutors.piceditor.editorengine.utils.WatermarkType
 import com.appexecutors.piceditorsample.databinding.ActivityMainBinding
+import com.appexecutors.piceditorsample.databinding.DialogCropBinding
 import com.appexecutors.picker.Picker
 import com.appexecutors.picker.Picker.Companion.PICKED_MEDIA_LIST
 import com.appexecutors.picker.Picker.Companion.REQUEST_CODE_PICKER
@@ -42,9 +46,10 @@ class MainActivity : AppCompatActivity() {
             showCaption = true
             showDrawOption = false
             showTextOption = false
-            showThumbnail = false
+            showThumbnail = true
             isCaptionCompulsory = false
             mWatermarkType = WatermarkType.DATE
+            openWithCropOption = true
         }
     }
 
@@ -52,14 +57,44 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_PICKER){
-            val mImageList = data?.getStringArrayListExtra(PICKED_MEDIA_LIST) as ArrayList
-            mImageList.map {
-                mEditOptions.mSelectedImageList.add(MediaFinal(it))
+
+            if (mEditOptions.openWithCropOption) {
+
+                //show cropping wra
+                val dialog = Dialog(this)
+                val mDialogBinding: DialogCropBinding = DialogCropBinding.inflate(
+                    LayoutInflater.from(this), null, false
+                )
+                dialog.setContentView(mDialogBinding.root)
+                dialog.window!!.setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
+                dialog.setCancelable(false)
+                dialog.show()
+
+                mDialogBinding.buttonDone.setOnClickListener {
+                    dialog.dismiss()
+                    val mImageList = data?.getStringArrayListExtra(PICKED_MEDIA_LIST) as ArrayList
+                    mImageList.map {
+                        mEditOptions.mSelectedImageList.add(MediaFinal(it))
+                    }
+                    PicEditor.startEditing(
+                        this,
+                        mEditOptions
+                    )
+                }
+            }else{
+                val mImageList = data?.getStringArrayListExtra(PICKED_MEDIA_LIST) as ArrayList
+                mImageList.map {
+                    mEditOptions.mSelectedImageList.add(MediaFinal(it))
+                }
+                PicEditor.startEditing(
+                    this,
+                    mEditOptions
+                )
             }
-            PicEditor.startEditing(
-                this,
-                mEditOptions
-            )
         }
 
         if (resultCode == Activity.RESULT_CANCELED && requestCode == PicEditor.REQUEST_CODE_EDITOR) mEditOptions.mSelectedImageList = ArrayList()

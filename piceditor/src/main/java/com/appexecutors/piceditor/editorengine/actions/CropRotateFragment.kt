@@ -106,6 +106,7 @@ class CropRotateFragment : Fragment(), CropAspectRatioAdapter.AspectRationInterf
             }
             if (mViewModel.mMediaPreviewList != null){
                 mViewModel.mMediaPreviewList!![mViewModel.mCurrentMediaPosition].mProcessedBitmap = mCroppedBitmap
+                mViewModel.mMediaPreviewList!![mViewModel.mCurrentMediaPosition].mImageCropped = true
             }
             findNavController().navigate(CropRotateFragmentDirections.actionCropRotateFragmentToPicEditorFragment())
         }
