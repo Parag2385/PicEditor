@@ -11,17 +11,15 @@ import androidx.lifecycle.ViewModelProvider
 import com.appexecutors.piceditor.R
 import com.appexecutors.piceditor.databinding.FragmentVideoPreviewBinding
 import com.appexecutors.piceditor.editorengine.PicViewModel
-import com.appexecutors.piceditor.editorengine.utils.AppConstants.MAX_BUFFER_DURATION
 import com.appexecutors.piceditor.editorengine.utils.AppConstants.MEDIA_POSITION
-import com.appexecutors.piceditor.editorengine.utils.AppConstants.MIN_BUFFER_DURATION
-import com.appexecutors.piceditor.editorengine.utils.AppConstants.MIN_PLAYBACK_RESUME_BUFFER
-import com.appexecutors.piceditor.editorengine.utils.AppConstants.MIN_PLAYBACK_START_BUFFER
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.*
-import com.google.android.exoplayer2.upstream.*
+import com.google.android.exoplayer2.upstream.DataSource
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 
 /**
@@ -63,20 +61,15 @@ class VideoPreviewFragment : Fragment() {
 
     private fun initializePlayer(mImageUri: String?) {
         if (player == null) { // 1. Create a default TrackSelector
-            val loadControl: LoadControl = DefaultLoadControl(
-                DefaultAllocator(true, 16),
-                MIN_BUFFER_DURATION,
-                MAX_BUFFER_DURATION,
-                MIN_PLAYBACK_START_BUFFER,
-                MIN_PLAYBACK_RESUME_BUFFER, -1, true
-            )
-            val bandwidthMeter: BandwidthMeter = DefaultBandwidthMeter()
+            val loadControl: LoadControl = DefaultLoadControl.Builder()
+                .setBufferDurationsMs(32*1024, 64*1024, 1024, 1024).createDefaultLoadControl()
+
             val videoTrackSelectionFactory: TrackSelection.Factory =
-                AdaptiveTrackSelection.Factory(bandwidthMeter)
+                AdaptiveTrackSelection.Factory()
             val trackSelector: TrackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
             // 2. Create the player
             player = ExoPlayerFactory.newSimpleInstance(
-                DefaultRenderersFactory(mBinding.root.context), trackSelector,
+                mBinding.root.context, trackSelector,
                 loadControl
             )
             mBinding.videoFullScreenPlayer.player = player
@@ -140,22 +133,22 @@ class VideoPreviewFragment : Fragment() {
         val videoSource: MediaSource = ExtractorMediaSource.Factory(dataSourceFactory)
             .createMediaSource(mUri)
         // Prepare the player with the source.
-        player!!.prepare(videoSource)
-        player!!.playWhenReady = true
-        player!!.addListener(eventListener)
+        player?.prepare(videoSource)
+        player?.playWhenReady = true
+        player?.addListener(eventListener)
     }
 
     private fun releasePlayer() {
         if (player != null) {
-            player!!.release()
+            player?.release()
             player = null
         }
     }
 
     private fun pausePlayer() {
         if (player != null) {
-            player!!.playWhenReady = false
-            player!!.playbackState
+            player?.playWhenReady = false
+            player?.playbackState
         }
     }
 

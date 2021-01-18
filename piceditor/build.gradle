@@ -72,7 +72,7 @@ dependencies {
     implementation 'ja.burhanrashid52:photoeditor:1.1.0'
 
     //exo player
-    implementation 'com.google.android.exoplayer:exoplayer:2.7.3'
+    implementation 'com.google.android.exoplayer:exoplayer:2.10.8'
 
     //EventBus
     implementation 'org.greenrobot:eventbus:3.1.1'
