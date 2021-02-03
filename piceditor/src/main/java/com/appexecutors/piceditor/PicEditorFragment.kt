@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -69,7 +70,7 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_pic_editor, container, false)
         return mBinding.root
@@ -119,17 +120,20 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
 
     private fun checkIfImagesAreCropped(){
 
-        val delay = if(mViewModel.mCurrentMediaPosition == 0) 500L else 10L
+        val delay = if(mViewModel.mCurrentMediaPosition == 0) 1000L else 100L
 
         if (mEditOptions.openWithCropOption){
-            Handler().postDelayed({
-                if (!mViewModel.mMediaPreviewList!![mViewModel.mCurrentMediaPosition].mImageCropped){
-                    if (mMediaPreviewAdapter?.getCurrentFragment(mViewModel.mCurrentMediaPosition) is ImagePreviewFragment) {
-                        val mImageFragment =
-                            mMediaPreviewAdapter?.getCurrentFragment(mViewModel.mCurrentMediaPosition) as ImagePreviewFragment?
-                        mImageFragment?.saveSingleBitmap()
+            Handler(Looper.getMainLooper()).postDelayed({
+                mViewModel.mMediaPreviewList?.let {
+                    if (!it[mViewModel.mCurrentMediaPosition].mImageCropped){
+                        if (mMediaPreviewAdapter?.getCurrentFragment(mViewModel.mCurrentMediaPosition) is ImagePreviewFragment) {
+                            val mImageFragment =
+                                mMediaPreviewAdapter?.getCurrentFragment(mViewModel.mCurrentMediaPosition) as ImagePreviewFragment?
+                            mImageFragment?.saveSingleBitmap()
+                        }
                     }
                 }
+
             }, delay)
         }
     }
@@ -401,7 +405,7 @@ class PicEditorFragment : Fragment(), MediaThumbnailAdapter.ThumbnailInterface,
                 getAllImages(true)
             }
 
-            Handler().postDelayed({
+            Handler(Looper.getMainLooper()).postDelayed({
                 val intent = Intent()
                 intent.putExtra(EDITED_MEDIA_LIST, mViewModel.mMediaFinalList)
                 requireActivity().setResult(RESULT_OK, intent)
